@@ -84,7 +84,14 @@ def fetch_latest_episode_audio(channel_url: str):
         return video_id, title, audio_filename
 
     except subprocess.CalledProcessError as e:
-        print(f"Error fetching from yt-dlp: {e.stderr}")
+        stderr = e.stderr or ""
+        print(f"yt-dlp command failed with exit code {e.returncode}")
+        print(f"Error Details: {stderr}")
+        
+        if "confirm you're not a bot" in stderr or "Sign in to confirm" in stderr:
+            print("🛑 CRITICAL: YouTube detected this runner as a bot. Tier 2 (Cookies) required.")
+            raise Exception("YouTube Bot Detection Blocked the Request. Please upload cookies.txt.")
+            
         return None, None, None
 
 def download_video_segment(video_id: str, start_time: float, end_time: float, output_filename: str):
