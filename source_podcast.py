@@ -38,6 +38,10 @@ def fetch_latest_episode_audio(channel_url: str):
         "--no-check-certificates"
     ]
     
+    if os.path.exists("cookies.txt"):
+        print("Cookies file found. Using authenticated session for bypass...")
+        bypass_flags.extend(["--cookies", "cookies.txt"])
+    
     # Get metadata of the latest video in the channel
     cmd_meta = [
         "yt-dlp", channel_url,
