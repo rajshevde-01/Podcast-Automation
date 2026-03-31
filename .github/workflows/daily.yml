@@ -1,0 +1,59 @@
+name: Daily Podcast Shorts Automation
+
+on:
+  schedule:
+    # 9:00 AM IST (03:30 UTC) and 7:00 PM IST (13:30 UTC)
+    - cron: "30 03 * * *"
+    - cron: "30 13 * * *"
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg imagemagick libgl1-mesa-glx libsm6 libxext6
+          # Fix ImageMagick policy to allow text rendering for moviepy
+          sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml || true
+
+      - name: Cache PyTorch & Models
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/huggingface
+          key: podcast-automation-${{ runner.os }}-py311
+          restore-keys: podcast-automation-${{ runner.os }}-
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Main Automation Script
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: |
+          python main.py
+
+      - name: Upload Database Tracker Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sqlite-database
+          path: podcast_automation.db

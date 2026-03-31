@@ -1,0 +1,21 @@
+# Core YouTube & Downloading
+yt-dlp==2024.03.10
+google-api-python-client==2.122.0
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+
+# Video & Image Processing
+moviepy==1.0.3
+Pillow==10.2.0
+opencv-python==4.9.0.80
+mediapipe==0.10.11
+
+# NLP & LLM
+groq==0.4.2
+faster-whisper==1.0.1
+
+# Utilities
+python-dotenv==1.0.1
+sqlalchemy==2.0.28
+numpy==1.26.4
+requests==2.31.0
