@@ -28,15 +28,23 @@ def fetch_latest_episode_audio(channel_url: str):
     """
     print(f"Fetching latest episode from {channel_url}...")
     
+    # Bypass flags for GitHub Actions
+    bypass_flags = [
+        "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "--extractor-args", "youtube:player-client=ios,android,web_creator",
+        "--add-header", "Accept-Language:en-US,en;q=0.9",
+        "--add-header", "Origin:https://www.youtube.com",
+        "--add-header", "Referer:https://www.youtube.com/",
+        "--no-check-certificates"
+    ]
+    
     # Get metadata of the latest video in the channel
-    # --flat-playlist to get list fast, fetch top 1
-    # Note: we use /videos to ensure we don't grab shorts if the channel mixes them, yt-dlp usually handles the default tab
     cmd_meta = [
         "yt-dlp", channel_url,
         "--playlist-items", "1",
         "--dump-json",
-        "--match-filter", "duration > 600" # Only videos longer than 10 mins (avoiding shorts/trailers)
-    ]
+        "--match-filter", "duration > 600" # Only videos longer than 10 mins
+    ] + bypass_flags
     
     try:
         result = subprocess.run(cmd_meta, capture_output=True, text=True, check=True)
@@ -64,7 +72,7 @@ def fetch_latest_episode_audio(channel_url: str):
             "-f", "bestaudio[ext=m4a]/bestaudio",
             "-o", audio_filename,
             f"https://www.youtube.com/watch?v={video_id}"
-        ]
+        ] + bypass_flags
         
         print("Downloading audio track...")
         subprocess.run(cmd_download, check=True)
@@ -83,6 +91,16 @@ def download_video_segment(video_id: str, start_time: float, end_time: float, ou
     url = f"https://www.youtube.com/watch?v={video_id}"
     print(f"Downloading video segment {start_time} - {end_time}...")
     
+    # Bypass flags for GitHub Actions
+    bypass_flags = [
+        "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "--extractor-args", "youtube:player-client=ios,android,web_creator",
+        "--add-header", "Accept-Language:en-US,en;q=0.9",
+        "--add-header", "Origin:https://www.youtube.com",
+        "--add-header", "Referer:https://www.youtube.com/",
+        "--no-check-certificates"
+    ]
+    
     # We download 1080p or 720p mp4 video
     cmd = [
         "yt-dlp",
@@ -91,15 +109,18 @@ def download_video_segment(video_id: str, start_time: float, end_time: float, ou
         "--force-keyframes-at-cuts",
         "-o", output_filename,
         url
-    ]
+    ] + bypass_flags
     
     subprocess.run(cmd, check=True)
     return output_filename
 
 if __name__ == "__main__":
     podcast = get_random_podcast()
-    print(f"Selected Podcast: {podcast['name']}")
-    vid, title, audio_file = fetch_latest_episode_audio(podcast['url'])
-    if audio_file:
-        print(f"Success! Audio saved to {audio_file}")
+    if podcast:
+        print(f"Selected Podcast: {podcast['name']}")
+        vid, title, audio_file = fetch_latest_episode_audio(podcast['url'])
+        if audio_file:
+            print(f"Success! Audio saved to {audio_file}")
+    else:
+        print("No podcasts defined in list.")
         # Next step would be transcribing and finding highlights, which will be in extract_highlights.py
