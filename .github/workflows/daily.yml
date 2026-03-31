@@ -24,7 +24,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg imagemagick libgl1 libsm6 libxext6
+          sudo apt-get install -y ffmpeg imagemagick libgl1 libsm6 libxext6 pkg-config libavformat-dev libavcodec-dev libavdevice-dev libavutil-dev libswscale-dev libswresample-dev libavfilter-dev
           # Fix ImageMagick policy to allow text rendering for moviepy
           sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml || true
 
