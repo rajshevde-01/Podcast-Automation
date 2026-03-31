@@ -1,5 +1,5 @@
 # Core YouTube & Downloading
-yt-dlp==2024.03.10
+yt-dlp
 google-api-python-client==2.122.0
 google-auth-oauthlib==1.2.0
 google-auth-httplib2==0.2.0

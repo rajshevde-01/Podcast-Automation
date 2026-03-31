@@ -1,0 +1,1226 @@
+﻿
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:48.488155
+9Z   LD_LIBRARY_PATH: /
+opt/hostedtoolcache/Pyt
+hon/3.11.15/x64/lib
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:48.488187
+0Z ##[endgroup]
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:49.379738
+8Z Requirement already 
+satisfied: pip in /opt/
+hostedtoolcache/Python/
+3.11.15/x64/lib/python3
+.11/site-packages 
+(26.0.1)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:50.208344
+9Z Collecting 
+yt-dlp==2024.03.10 
+(from -r 
+requirements.txt (line 
+2))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:50.265323
+5Z   Downloading yt_dlp
+-2024.3.10-py3-none-any
+.whl.metadata (164 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:50.345600
+7Z Collecting google-ap
+i-python-client==2.122.
+0 (from -r 
+requirements.txt (line 
+3))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:50.349417
+0Z   Downloading google
+_api_python_client-2.12
+2.0-py2.py3-none-any.wh
+l.metadata (6.6 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:50.361801
+1Z Collecting google-au
+th-oauthlib==1.2.0 
+(from -r 
+requirements.txt (line 
+4))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:50.364402
+8Z   Downloading google
+_auth_oauthlib-1.2.0-py
+2.py3-none-any.whl.meta
+data (2.7 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:51.938989
+8Z   Downloading opencv
+_python-4.9.0.80-cp37-a
+bi3-manylinux_2_17_x86_
+64.manylinux2014_x86_64
+.whl.metadata (20 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:51.962835
+9Z Collecting 
+mediapipe==0.10.11 
+(from -r 
+requirements.txt (line 
+11))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.027714
+4Z   Downloading mediap
+ipe-0.10.11-cp311-cp311
+-manylinux_2_17_x86_64.
+manylinux2014_x86_64.wh
+l.metadata (9.7 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.042997
+4Z Collecting 
+groq==0.4.2 (from -r 
+requirements.txt (line 
+14))
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.046211
+2Z   Downloading groq-0
+.4.2-py3-none-any.whl.m
+etadata (12 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.061356
+8Z Collecting 
+faster-whisper==1.0.1 
+(from -r 
+requirements.txt (line 
+15))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.064708
+2Z   Downloading faster
+_whisper-1.0.1-py3-none
+-any.whl.metadata (14 
+kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.077907
+7Z Collecting 
+python-dotenv==1.0.1 
+(from -r 
+requirements.txt (line 
+18))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.080563
+3Z   Downloading python
+_dotenv-1.0.1-py3-none-
+any.whl.metadata (23 
+kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.331681
+0Z Collecting 
+sqlalchemy==2.0.28 
+(from -r 
+requirements.txt (line 
+19))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.514679
+7Z   Downloading numpy-
+1.26.4-cp311-cp311-many
+linux_2_17_x86_64.manyl
+inux2014_x86_64.whl.met
+adata (61 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.541772
+2Z Collecting 
+requests==2.31.0 (from 
+-r requirements.txt 
+(line 21))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.544482
+0Z   Downloading reques
+ts-2.31.0-py3-none-any.
+whl.metadata (4.6 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.577134
+7Z Collecting brotli 
+(from 
+yt-dlp==2024.03.10->-r 
+requirements.txt (line 
+2))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.579518
+8Z   Downloading brotli
+-1.2.0-cp311-cp311-many
+linux2014_x86_64.manyli
+nux_2_17_x86_64.whl.met
+adata (6.1 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.595787
+7Z Collecting certifi 
+(from 
+yt-dlp==2024.03.10->-r 
+requirements.txt (line 
+2))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.598612
+8Z   Downloading certif
+i-2026.2.25-py3-none-an
+y.whl.metadata (2.5 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.609891
+2Z Collecting mutagen 
+(from 
+yt-dlp==2024.03.10->-r 
+requirements.txt (line 
+2))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.612173
+0Z   Downloading mutage
+n-1.47.0-py3-none-any.w
+hl.metadata (1.7 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.708445
+4Z Collecting 
+pycryptodomex (from 
+yt-dlp==2024.03.10->-r 
+requirements.txt (line 
+2))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.711122
+2Z   Downloading pycryp
+todomex-3.23.0-cp37-abi
+3-manylinux_2_17_x86_64
+.manylinux2014_x86_64.w
+hl.metadata (3.4 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.730320
+5Z Collecting 
+urllib3<3,>=1.26.17 
+(from 
+yt-dlp==2024.03.10->-r 
+requirements.txt (line 
+2))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.732739
+8Z   Downloading urllib
+3-2.6.3-py3-none-any.wh
+l.metadata (6.9 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.811365
+4Z Collecting 
+websockets>=12.0 (from 
+yt-dlp==2024.03.10->-r 
+requirements.txt (line 
+2))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.814179
+3Z   Downloading websoc
+kets-16.0-cp311-cp311-m
+anylinux1_x86_64.manyli
+nux_2_28_x86_64.manylin
+ux_2_5_x86_64.whl.metad
+ata (6.8 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.896851
+2Z Collecting charset-n
+ormalizer<4,>=2 (from 
+requests==2.31.0->-r 
+requirements.txt (line 
+21))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.899704
+6Z   Downloading charse
+t_normalizer-3.4.6-cp31
+1-cp311-manylinux2014_x
+86_64.manylinux_2_17_x8
+6_64.manylinux_2_28_x86
+_64.whl.metadata (40 
+kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.914845
+5Z Collecting 
+idna<4,>=2.5 (from 
+requests==2.31.0->-r 
+requirements.txt (line 
+21))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:52.917192
+4Z   Downloading idna-3
+.11-py3-none-any.whl.me
+tadata (8.4 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.713258
+3Z   Downloading protob
+uf-3.20.3-py2.py3-none-
+any.whl.metadata (720 
+bytes)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.732396
+8Z Collecting 
+sounddevice>=0.4.4 
+(from 
+mediapipe==0.10.11->-r 
+requirements.txt (line 
+11))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.735071
+8Z   Downloading soundd
+evice-0.5.5-py3-none-an
+y.whl.metadata (1.4 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.751600
+9Z Collecting 
+anyio<5,>=3.5.0 (from 
+groq==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.754169
+5Z   Downloading anyio-
+4.13.0-py3-none-any.whl
+.metadata (4.5 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.764304
+2Z Collecting 
+distro<2,>=1.7.0 (from 
+groq==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.766967
+9Z   Downloading distro
+-1.9.0-py3-none-any.whl
+.metadata (6.8 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.782944
+0Z Collecting 
+httpx<1,>=0.23.0 (from 
+groq==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.785584
+2Z   Downloading httpx-
+0.28.1-py3-none-any.whl
+.metadata (7.1 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.942529
+4Z Collecting 
+pydantic<3,>=1.9.0 
+(from groq==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.945274
+4Z   Downloading pydant
+ic-2.12.5-py3-none-any.
+whl.metadata (90 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.957781
+3Z Collecting sniffio 
+(from groq==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.960235
+8Z   Downloading sniffi
+o-1.3.1-py3-none-any.wh
+l.metadata (3.9 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.974298
+3Z Collecting typing-ex
+tensions<5,>=4.7 (from 
+groq==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:53.976847
+7Z   Downloading typing
+_extensions-4.15.0-py3-
+none-any.whl.metadata 
+(3.3 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:54.017611
+9Z Collecting av==11.* 
+(from faster-whisper==1
+.0.1->-r 
+requirements.txt (line 
+15))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:54.020496
+4Z   Downloading 
+av-11.0.0.tar.gz (3.7 
+MB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:54.049963
+1Z      ΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓ
+öüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöü 3.7/3.7 
+MB 139.7 MB/s  0:00:00
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:04:54.254168
+0Z   Installing build 
+dependencies: started
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.874726
+2Z   Downloading google
+apis_common_protos-1.73
+.0-py3-none-any.whl.met
+adata (9.4 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.898789
+8Z Collecting 
+pyparsing<4,>=3.1 
+(from httplib2<1.dev0,>
+=0.15.0->google-api-pyt
+hon-client==2.122.0->-r
+ requirements.txt 
+(line 3))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.901349
+2Z   Downloading pypars
+ing-3.3.2-py3-none-any.
+whl.metadata (5.8 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.917436
+6Z Collecting 
+httpcore==1.* (from htt
+px<1,>=0.23.0->groq==0.
+4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.919993
+3Z   Downloading httpco
+re-1.0.9-py3-none-any.w
+hl.metadata (21 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.931215
+0Z Collecting 
+h11>=0.16 (from httpcor
+e==1.*->httpx<1,>=0.23.
+0->groq==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.933636
+3Z   Downloading h11-0.
+16.0-py3-none-any.whl.m
+etadata (8.3 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.953735
+8Z Collecting 
+packaging (from onnxrun
+time<2,>=1.14->faster-w
+hisper==1.0.1->-r 
+requirements.txt (line 
+15))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.955146
+3Z   Using cached packa
+ging-26.0-py3-none-any.
+whl.metadata (3.3 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.967319
+1Z Collecting sympy 
+(from onnxruntime<2,>=1
+.14->faster-whisper==1.
+0.1->-r 
+requirements.txt (line 
+15))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.970053
+4Z   Downloading sympy-
+1.14.0-py3-none-any.whl
+.metadata (12 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.978567
+8Z INFO: pip is 
+looking at multiple 
+versions of proto-plus 
+to determine which 
+version is compatible 
+with other 
+requirements. This 
+could take a while.
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.979043
+3Z Collecting proto-plu
+s<2.0.0,>=1.22.3 (from 
+google-api-core!=2.0.*,
+!=2.1.*,!=2.2.*,!=2.3.0
+,<3.0.0.dev0,>=1.31.5->
+google-api-python-clien
+t==2.122.0->-r 
+requirements.txt (line 
+3))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.981440
+4Z   Downloading proto_
+plus-1.27.1-py3-none-an
+y.whl.metadata (2.2 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.995270
+0Z Collecting 
+annotated-types>=0.6.0 
+(from pydantic<3,>=1.9.
+0->groq==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:07.997674
+8Z   Downloading annota
+ted_types-0.7.0-py3-non
+e-any.whl.metadata (15 
+kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:08.647322
+7Z Collecting 
+pydantic-core==2.41.5 
+(from pydantic<3,>=1.9.
+0->groq==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:08.650257
+6Z   Downloading pydant
+ic_core-2.41.5-cp311-cp
+311-manylinux_2_17_x86_
+64.manylinux2014_x86_64
+.whl.metadata (7.3 kB)
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:08.660575
+3Z Collecting typing-in
+spection>=0.4.2 (from p
+ydantic<3,>=1.9.0->groq
+==0.4.2->-r 
+requirements.txt (line 
+14))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:08.663106
+9Z   Downloading typing
+_inspection-0.4.2-py3-n
+one-any.whl.metadata 
+(2.6 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:08.676024
+9Z Collecting 
+huggingface-hub>=0.13 
+(from faster-whisper==1
+.0.1->-r 
+requirements.txt (line 
+15))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:08.678567
+7Z   Downloading huggin
+gface_hub-0.36.2-py3-no
+ne-any.whl.metadata 
+(15 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:08.708990
+1Z Collecting filelock 
+(from huggingface-hub>=
+0.13->faster-whisper==1
+.0.1->-r 
+requirements.txt (line 
+15))
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:08.711540
+7Z   Downloading filelo
+ck-3.25.2-py3-none-any.
+whl.metadata (2.0 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:10.850308
+2Z    ΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓ
+öüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓ
+öüΓöüΓöüΓöü 62.2/62.2 
+MB 253.4 MB/s  0:00:00
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:10.926774
+9Z Downloading mediapip
+e-0.10.11-cp311-cp311-m
+anylinux_2_17_x86_64.ma
+nylinux2014_x86_64.whl 
+(35.6 MB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:13.375363
+9Z    ΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓ
+öüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓ
+öüΓöüΓöüΓöü 35.6/35.6 
+MB 14.5 MB/s  0:00:02
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:13.378706
+7Z Downloading groq-0.4
+.2-py3-none-any.whl 
+(65 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:13.385833
+1Z Downloading faster_w
+hisper-1.0.1-py3-none-a
+ny.whl (1.5 MB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:13.400579
+3Z    ΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓ
+öüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓ
+öüΓöüΓöüΓöü 1.5/1.5 MB 
+143.3 MB/s  0:00:00
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:13.403390
+1Z Downloading python_d
+otenv-1.0.1-py3-none-an
+y.whl (19 kB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:13.409542
+9Z Downloading SQLAlche
+my-2.0.28-cp311-cp311-m
+anylinux_2_17_x86_64.ma
+nylinux2014_x86_64.whl 
+(3.2 MB)
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:05:13.428499
+0Z    ΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓ
+öüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓö
+üΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓ
+öüΓöüΓöüΓöü 3.2/3.2 MB 
+203.9 MB/s  0:00:00
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:07:08.144171
+3Z   Created wheel for 
+av: filename=av-11.0.0-
+cp311-cp311-linux_x86_6
+4.whl size=10164811 sha
+256=cb592e0962b1e65b6ed
+f9b85f1b1bec238ec04e232
+f8426e885ba5a9f17dd529
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:07:08.144362
+6Z   Stored in 
+directory: /home/runner
+/.cache/pip/wheels/b9/0
+5/f7/395825760fe6def77d
+acafd7f0d9863613d591d43
+b8052bbb7
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:07:08.146741
+8Z Successfully built 
+moviepy av
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:07:08.396244
+1Z Installing 
+collected packages: nvi
+dia-cusparselt-cu13, 
+mpmath, flatbuffers, 
+cuda-toolkit, brotli, 
+websockets, urllib3, 
+uritemplate, 
+typing-extensions, 
+triton, tqdm, sympy, 
+sniffio, six, pyyaml, 
+python-dotenv, 
+pyparsing, 
+pycryptodomex, 
+pycparser, pyasn1, 
+protobuf, Pillow, 
+packaging, opt_einsum, 
+oauthlib, nvidia-nvtx, 
+nvidia-nvshmem-cu13, 
+nvidia-nvjitlink, 
+nvidia-nccl-cu13, 
+nvidia-curand, 
+nvidia-cufile, 
+nvidia-cuda-runtime, 
+nvidia-cuda-nvrtc, 
+nvidia-cuda-cupti, 
+nvidia-cublas, numpy, 
+networkx, mutagen, 
+MarkupSafe, 
+kiwisolver, 
+imageio_ffmpeg, idna, 
+hf-xet, h11, greenlet, 
+fsspec, fonttools, 
+filelock, distro, 
+decorator, cycler, 
+cuda-pathfinder, 
+charset-normalizer, 
+certifi, av, attrs, 
+annotated-types, 
+absl-py, 
+typing-inspection, 
+sqlalchemy, scipy, 
+requests, 
+python-dateutil, 
+pydantic-core, 
+pyasn1-modules, 
+proto-plus, proglog, 
+opencv-python, 
+opencv-contrib-python, 
+onnxruntime, 
+nvidia-cusparse, 
+nvidia-cufft, 
+nvidia-cudnn-cu13, 
+ml_dtypes, jinja2, 
+imageio, httplib2, 
+httpcore, googleapis-co
+mmon-protos, 
+cuda-bindings, 
+ctranslate2, 
+contourpy, cffi, 
+anyio, yt-dlp, 
+sounddevice, 
+requests-oauthlib, 
+pydantic, 
+nvidia-cusolver, 
+moviepy, matplotlib, 
+jaxlib, 
+huggingface-hub, 
+httpx, cryptography, 
+tokenizers, jax, groq, 
+google-auth, torch, 
+google-auth-oauthlib, 
+google-auth-httplib2, 
+google-api-core, 
+faster-whisper, 
+mediapipe, google-api-p
+ython-client
+  run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:07:59.725453
+4Z 
+> run-pipeline	Install 
+Python Dependencies	202
+6-03-31T09:07:59.730457
+2Z Successfully 
+installed 
+MarkupSafe-3.0.3 
+Pillow-10.2.0 
+absl-py-2.4.0 
+annotated-types-0.7.0 
+anyio-4.13.0 
+attrs-26.1.0 av-11.0.0 
+brotli-1.2.0 
+certifi-2026.2.25 
+cffi-2.0.0 charset-norm
+alizer-3.4.6 
+contourpy-1.3.3 
+cryptography-46.0.6 
+ctranslate2-4.7.1 
+cuda-bindings-13.2.0 
+cuda-pathfinder-1.5.0 
+cuda-toolkit-13.0.2 
+cycler-0.12.1 
+decorator-4.4.2 
+distro-1.9.0 
+faster-whisper-1.0.1 
+filelock-3.25.2 
+flatbuffers-25.12.19 
+fonttools-4.62.1 
+fsspec-2026.3.0 
+google-api-core-2.29.0 
+google-api-python-clien
+t-2.122.0 
+google-auth-2.49.1 goog
+le-auth-httplib2-0.2.0 
+google-auth-oauthlib-1.
+2.0 googleapis-common-p
+rotos-1.73.0 
+greenlet-3.3.2 
+groq-0.4.2 h11-0.16.0 
+hf-xet-1.4.2 
+httpcore-1.0.9 
+httplib2-0.31.2 
+httpx-0.28.1 
+huggingface-hub-0.36.2 
+idna-3.11 
+imageio-2.37.3 
+imageio_ffmpeg-0.6.0 
+jax-0.7.1 jaxlib-0.7.1 
+jinja2-3.1.6 
+kiwisolver-1.5.0 
+matplotlib-3.10.8 
+mediapipe-0.10.11 
+ml_dtypes-0.5.4 
+moviepy-1.0.3 
+mpmath-1.3.0 
+mutagen-1.47.0 
+networkx-3.6.1 
+numpy-1.26.4 
+nvidia-cublas-13.1.0.3 
+nvidia-cuda-cupti-13.0.
+85 nvidia-cuda-nvrtc-13
+.0.88 nvidia-cuda-runti
+me-13.0.96 nvidia-cudnn
+-cu13-9.19.0.56 
+nvidia-cufft-12.0.0.61 
+nvidia-cufile-1.15.1.6 
+nvidia-curand-10.4.0.35
+ nvidia-cusolver-12.0.4
+.66 nvidia-cusparse-12.
+6.3.3 nvidia-cusparselt
+-cu13-0.8.0 nvidia-nccl
+-cu13-2.28.9 nvidia-nvj
+itlink-13.0.88 nvidia-n
+vshmem-cu13-3.4.5 
+nvidia-nvtx-13.0.85 
+oauthlib-3.3.1 
+onnxruntime-1.24.4 open
+cv-contrib-python-4.11.
+0.86 
+opencv-python-4.9.0.80 
+opt_einsum-3.4.0 
+packaging-26.0 
+proglog-0.1.12 
+proto-plus-1.27.1 
+protobuf-3.20.3 
+pyasn1-0.6.3 
+pyasn1-modules-0.4.2 
+pycparser-3.0 
+pycryptodomex-3.23.0 
+pydantic-2.12.5 
+pydantic-core-2.41.5 
+pyparsing-3.3.2 python-
+dateutil-2.9.0.post0 
+python-dotenv-1.0.1 
+pyyaml-6.0.3 
+requests-2.31.0 request
+s-oauthlib-2.0.0 
+scipy-1.17.1 
+six-1.17.0 
+sniffio-1.3.1 
+sounddevice-0.5.5 
+sqlalchemy-2.0.28 
+sympy-1.14.0 
+tokenizers-0.15.2 
+torch-2.11.0 
+tqdm-4.67.3 
+triton-3.6.0 typing-ext
+ensions-4.15.0 typing-i
+nspection-0.4.2 
+uritemplate-4.2.0 
+urllib3-2.6.3 
+websockets-16.0 
+yt-dlp-2024.3.10
+  run-pipeline	Run 
+Main Automation Script	
+∩╗┐2026-03-31T09:08:00.
+7585837Z ##[group]Run 
+python main.py
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.758
+6145Z [36;1mpython 
+main.py[0m
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.768
+5526Z shell: 
+/usr/bin/bash -e {0}
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.768
+5810Z env:
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.768
+6080Z   
+pythonLocation: /opt/ho
+stedtoolcache/Python/3.
+11.15/x64
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.768
+7316Z   
+Python2_ROOT_DIR: /opt/
+hostedtoolcache/Python/
+3.11.15/x64
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.768
+7688Z   
+Python3_ROOT_DIR: /opt/
+hostedtoolcache/Python/
+3.11.15/x64
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.768
+8061Z   
+LD_LIBRARY_PATH: /opt/h
+ostedtoolcache/Python/3
+.11.15/x64/lib
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.768
+8637Z   GROQ_API_KEY: 
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.768
+9337Z   
+YOUTUBE_CLIENT_ID: ***
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.768
+9663Z   
+YOUTUBE_CLIENT_SECRET: 
+***
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.769
+0309Z   
+YOUTUBE_REFRESH_TOKEN: 
+***
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:00.769
+0539Z ##[endgroup]
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.443
+7454Z Starting Fully 
+Automated Podcast 
+Shorts Pipeline...
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.443
+8032Z Selected 
+Podcast: Dostcast
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.443
+8962Z Fetching latest 
+episode from https://ww
+w.youtube.com/@Dostcast
+...
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.443
+9662Z Error fetching 
+from yt-dlp: WARNING: 
+[youtube] YouTube 
+said: ERROR - 
+Precondition check 
+failed.
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+0329Z WARNING: 
+[youtube] HTTP Error 
+400: Bad Request. 
+Retrying (1/3)...
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+0860Z WARNING: 
+[youtube] YouTube 
+said: ERROR - 
+Precondition check 
+failed.
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+1386Z WARNING: 
+[youtube] HTTP Error 
+400: Bad Request. 
+Retrying (2/3)...
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+1903Z WARNING: 
+[youtube] YouTube 
+said: ERROR - 
+Precondition check 
+failed.
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+2414Z WARNING: 
+[youtube] HTTP Error 
+400: Bad Request. 
+Retrying (3/3)...
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+2916Z WARNING: 
+[youtube] YouTube 
+said: ERROR - 
+Precondition check 
+failed.
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+3617Z WARNING: 
+[youtube] Unable to 
+download API page: 
+HTTP Error 400: Bad 
+Request (caused by 
+<HTTPError 400: Bad 
+Request>)
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+4339Z WARNING: 
+[youtube] YouTube 
+said: ERROR - 
+Precondition check 
+failed.
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+4859Z WARNING: 
+[youtube] HTTP Error 
+400: Bad Request. 
+Retrying (1/3)...
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+5365Z WARNING: 
+[youtube] YouTube 
+said: ERROR - 
+Precondition check 
+failed.
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+5786Z WARNING: 
+[youtube] HTTP Error 
+400: Bad Request. 
+Retrying (2/3)...
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+6202Z WARNING: 
+[youtube] YouTube 
+said: ERROR - 
+Precondition check 
+failed.
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+6625Z WARNING: 
+[youtube] HTTP Error 
+400: Bad Request. 
+Retrying (3/3)...
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+7046Z WARNING: 
+[youtube] YouTube 
+said: ERROR - 
+Precondition check 
+failed.
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.444
+7631Z WARNING: 
+[youtube] Unable to 
+download API page: 
+HTTP Error 400: Bad 
+Request (caused by 
+<HTTPError 400: Bad 
+Request>)
+> run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.445
+1270Z ERROR: [youtube] 
+vxpUYQLtPtQ: Sign in 
+to confirm youΓÇÖre 
+not a bot. This helps 
+protect our community. 
+Learn more
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.445
+1771Z 
+  run-pipeline	Run 
+Main Automation Script	
+2026-03-31T09:08:07.445
+1891Z No new episodes 
+found. Exiting.
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	∩╗┐2026-03-31T
+09:08:07.9255540Z 
+##[group]Run actions/up
+load-artifact@v4
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:07.9255861Z with:
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:07.9256052Z   name: 
+sqlite-database
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:08.1667807Z Root 
+directory input is 
+valid!
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:08.4385964Z 
+Beginning upload of 
+artifact content to 
+blob storage
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:08.7207879Z 
+Uploaded bytes 588
+> run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:08.7966814Z 
+Finished uploading 
+artifact content to 
+blob storage!
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:08.7970567Z SHA256 
+digest of uploaded 
+artifact zip is 6d73aa1
+a7884bdaf0c187b807fe9e2
+e8ba4300d94ae6bb330dd94
+245da11417f
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:08.7972261Z 
+Finalizing artifact 
+upload
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:08.9765701Z 
+Artifact 
+sqlite-database.zip 
+successfully 
+finalized. Artifact ID 
+6195890439
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:08.9766994Z 
+Artifact 
+sqlite-database has 
+been successfully 
+uploaded! Final size 
+is 588 bytes. Artifact 
+ID is 6195890439
+  run-pipeline	Upload 
+Database Tracker 
+Artifact	2026-03-31T09:
+08:08.9774452Z 
+Artifact download URL: 
+https://github.com/rajs
+hevde-01/Podcast-Automa
+tion/actions/runs/23789
+342096/artifacts/619589
+0439
+
+
