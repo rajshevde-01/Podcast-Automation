@@ -2,9 +2,8 @@ name: Daily Podcast Shorts Automation
 
 on:
   schedule:
-    # 9:00 AM IST (03:30 UTC) and 7:00 PM IST (13:30 UTC)
-    - cron: "30 03 * * *"
-    - cron: "30 13 * * *"
+    # 5:00 PM IST (11:30 UTC)
+    - cron: "30 11 * * *"
   workflow_dispatch: # Allows manual trigger from GitHub Actions tab
 
 jobs:
