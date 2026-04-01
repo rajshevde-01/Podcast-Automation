@@ -47,7 +47,7 @@ def fetch_latest_episode_audio(channel_url: str):
         "yt-dlp", channel_url,
         "--playlist-items", "1",
         "--dump-json",
-        "--format", "best", # More flexible than default or specific formats during metadata phase
+        "--skip-download",
         "--match-filter", "duration > 600" # Only videos longer than 10 mins
     ] + bypass_flags
     
@@ -86,14 +86,21 @@ def fetch_latest_episode_audio(channel_url: str):
 
     except subprocess.CalledProcessError as e:
         stderr = e.stderr or ""
+        stdout = e.stdout or ""
         print(f"yt-dlp command failed with exit code {e.returncode}")
-        print(f"Error Details: {stderr}")
+        print(f"STDERR: {stderr[:2000]}")
+        print(f"STDOUT: {stdout[:500]}")
         
-        if "confirm you're not a bot" in stderr or "Sign in to confirm" in stderr:
-            print("🛑 CRITICAL: YouTube detected this runner as a bot. Tier 2 (Cookies) required.")
-            raise Exception("YouTube Bot Detection Blocked the Request. Please upload cookies.txt.")
+        bot_keywords = ["confirm you're not a bot", "Sign in to confirm", "bot", "captcha"]
+        if any(kw.lower() in stderr.lower() for kw in bot_keywords):
+            print("🛑 CRITICAL: YouTube detected this runner as a bot.")
+            if os.path.exists("cookies.txt"):
+                print("cookies.txt EXISTS but may be expired/invalid. Re-export from browser.")
+            else:
+                print("ACTION REQUIRED: Please upload a valid cookies.txt file.")
+            raise Exception("YouTube Bot Detection Block. Cookies may be expired.")
             
-        raise Exception(f"yt-dlp failed with error: {stderr}")
+        raise Exception(f"yt-dlp failed: {stderr[:500]}")
 
 def download_video_segment(video_id: str, start_time: float, end_time: float, output_filename: str):
     """
@@ -113,6 +120,9 @@ def download_video_segment(video_id: str, start_time: float, end_time: float, ou
         "--no-check-certificates"
     ]
     
+    if os.path.exists("cookies.txt"):
+        bypass_flags.extend(["--cookies", "cookies.txt"])
+    
     # We download 1080p or 720p mp4 video
     cmd = [
         "yt-dlp",
@@ -123,7 +133,7 @@ def download_video_segment(video_id: str, start_time: float, end_time: float, ou
         url
     ] + bypass_flags
     
-    subprocess.run(cmd, check=True)
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
     return output_filename
 
 if __name__ == "__main__":
