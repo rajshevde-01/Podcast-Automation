@@ -47,6 +47,7 @@ def fetch_latest_episode_audio(channel_url: str):
         "yt-dlp", channel_url,
         "--playlist-items", "1",
         "--dump-json",
+        "--format", "best", # More flexible than default or specific formats during metadata phase
         "--match-filter", "duration > 600" # Only videos longer than 10 mins
     ] + bypass_flags
     
@@ -92,7 +93,7 @@ def fetch_latest_episode_audio(channel_url: str):
             print("🛑 CRITICAL: YouTube detected this runner as a bot. Tier 2 (Cookies) required.")
             raise Exception("YouTube Bot Detection Blocked the Request. Please upload cookies.txt.")
             
-        return None, None, None
+        raise Exception(f"yt-dlp failed with error: {stderr}")
 
 def download_video_segment(video_id: str, start_time: float, end_time: float, output_filename: str):
     """
