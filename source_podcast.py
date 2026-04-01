@@ -28,84 +28,85 @@ def fetch_latest_episode_audio(channel_url: str):
     """
     print(f"Fetching latest episode from {channel_url}...")
     
-    # Bypass flags for GitHub Actions
-    # We use a mix of clients: TV and Web_Embedded are often more stable for downloads
-    # while standard 'web' and 'mweb' work well with cookies.
-    # Note: 'ios' and 'android' clients do NOT support cookies and are skipped by yt-dlp if --cookies is present.
-    bypass_flags = [
-        "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "--extractor-args", "youtube:player-client=tv,web_embedded",
-        "--add-header", "Accept-Language:en-US,en;q=0.9",
-        "--add-header", "Origin:https://www.youtube.com",
-        "--add-header", "Referer:https://www.youtube.com/",
-        "--no-check-certificates",
-        "--prefer-free-formats",
-        "--youtube-skip-dash-manifest"
+    # Client profiles to rotate through
+    profiles = [
+        {"name": "Authenticated Web/MWeb", "args": "youtube:player-client=web,mweb", "use_cookies": True},
+        {"name": "Authenticated TV/Embedded", "args": "youtube:player-client=tv,web_embedded", "use_cookies": True},
+        {"name": "Anonymous Android", "args": "youtube:player-client=android", "use_cookies": False},
+        {"name": "Anonymous iOS", "args": "youtube:player-client=ios", "use_cookies": False},
     ]
     
-    if os.path.exists("cookies.txt"):
-        print("Cookies file found. Using authenticated session for bypass...")
-        bypass_flags.extend(["--cookies", "cookies.txt"])
-    
-    # Get metadata of the latest video in the channel
-    cmd_meta = [
-        "yt-dlp", channel_url,
-        "--playlist-items", "1",
-        "--dump-json",
-        "--skip-download",
-        "--match-filter", "duration > 600" # Only videos longer than 10 mins
-    ] + bypass_flags
-    
-    try:
-        result = subprocess.run(cmd_meta, capture_output=True, text=True, check=True)
-        if not result.stdout.strip():
-            print("No suitable long-form video found.")
-            return None, None, None
+    last_error = ""
+    for profile in profiles:
+        print(f"Trying bypass profile: {profile['name']}...")
+        
+        current_flags = [
+            "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "--extractor-args", str(profile["args"]),
+            "--add-header", "Accept-Language:en-US,en;q=0.9",
+            "--add-header", "Origin:https://www.youtube.com",
+            "--add-header", "Referer:https://www.youtube.com/",
+            "--no-check-certificates",
+            "--prefer-free-formats",
+            "--youtube-skip-dash-manifest"
+        ]
+        
+        if profile["use_cookies"] and os.path.exists("cookies.txt"):
+            current_flags.extend(["--cookies", "cookies.txt"])
             
-        video_info = json.loads(result.stdout.strip().split('\n')[0])
-        video_id = video_info.get('id')
-        title = video_info.get('title')
+        cmd_meta = [
+            "yt-dlp", channel_url,
+            "--playlist-items", "1",
+            "--dump-json",
+            "--skip-download",
+            "--match-filter", "duration > 600"
+        ] + current_flags
         
-        print(f"Found latest episode: {title} ({video_id})")
-        
-        if is_episode_processed(video_id):
-            print("This episode has already been processed.")
-            return video_id, title, None
+        try:
+            result = subprocess.run(cmd_meta, capture_output=True, text=True, check=True)
+            if not result.stdout.strip():
+                continue # Try next profile
+                
+            video_info = json.loads(result.stdout.strip().split('\n')[0])
+            video_id = video_info.get('id')
+            title = video_info.get('title')
             
-        # Download audio
-        audio_filename = f"temp_audio_{video_id}.m4a"
-        if os.path.exists(audio_filename):
-            os.remove(audio_filename)
+            print(f"✅ Success with profile {profile['name']}! Found: {title} ({video_id})")
             
-        cmd_download = [
-            "yt-dlp",
-            "-f", "bestaudio[ext=m4a]/bestaudio",
-            "-o", audio_filename,
-            f"https://www.youtube.com/watch?v={video_id}"
-        ] + bypass_flags
-        
-        print("Downloading audio track...")
-        subprocess.run(cmd_download, check=True)
-        
-        return video_id, title, audio_filename
+            if is_episode_processed(video_id):
+                print("This episode has already been processed.")
+                return video_id, title, None
+                
+            # Download audio with WORKING current_flags
+            audio_filename = f"temp_audio_{video_id}.m4a"
+            if os.path.exists(audio_filename):
+                os.remove(audio_filename)
+                
+            cmd_download = [
+                "yt-dlp",
+                "-f", "bestaudio[ext=m4a]/bestaudio",
+                "-o", audio_filename,
+                f"https://www.youtube.com/watch?v={video_id}"
+            ] + current_flags
+            
+            print("Downloading audio track...")
+            subprocess.run(cmd_download, check=True)
+            
+            return video_id, title, audio_filename
 
-    except subprocess.CalledProcessError as e:
-        stderr = e.stderr or ""
-        stdout = e.stdout or ""
-        print(f"yt-dlp command failed with exit code {e.returncode}")
-        print(f"STDERR: {stderr[:2000]}")
-        print(f"STDOUT: {stdout[:500]}")
-        
-        bot_keywords = ["confirm you're not a bot", "Sign in to confirm", "bot", "captcha"]
-        if any(kw.lower() in stderr.lower() for kw in bot_keywords):
-            print("🛑 CRITICAL: YouTube detected this runner as a bot.")
-            if os.path.exists("cookies.txt"):
-                print("cookies.txt EXISTS but may be expired/invalid. Re-export from browser.")
-            else:
-                print("ACTION REQUIRED: Please upload a valid cookies.txt file.")
-            raise Exception("YouTube Bot Detection Block. Cookies may be expired.")
+        except subprocess.CalledProcessError as e:
+            last_error = e.stderr or ""
+            print(f"Profile {profile['name']} failed.")
+            continue
             
-        raise Exception(f"yt-dlp failed: {stderr[:500]}")
+    print(f"🛑 ALL BYPASS PROFILES FAILED.")
+    print(f"Last Error Sample: {last_error[:500]}")
+    
+    if any(kw.lower() in last_error.lower() for kw in ["bot", "captcha", "confirm you're not a bot", "Sign in to confirm"]):
+        print("ACTION REQUIRED: YouTube is aggressively blocking this runner. Update cookies.txt or provide a PO Token.")
+        raise Exception("YouTube Bot Detection Block. ALL profiles failed.")
+        
+    raise Exception(f"yt-dlp failed after trying all profiles: {last_error[:200]}")
 
 def download_video_segment(video_id: str, start_time: float, end_time: float, output_filename: str):
     """
@@ -115,10 +116,10 @@ def download_video_segment(video_id: str, start_time: float, end_time: float, ou
     url = f"https://www.youtube.com/watch?v={video_id}"
     print(f"Downloading video segment {start_time} - {end_time}...")
     
-    # Bypass flags (Synchronized with fetch_latest_episode_audio)
+    # Use Anonymous iOS for segments as it is currently the most robust for large downloads
     bypass_flags = [
         "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "--extractor-args", "youtube:player-client=tv,web_embedded",
+        "--extractor-args", "youtube:player-client=ios",
         "--add-header", "Accept-Language:en-US,en;q=0.9",
         "--add-header", "Origin:https://www.youtube.com",
         "--add-header", "Referer:https://www.youtube.com/",
@@ -127,8 +128,9 @@ def download_video_segment(video_id: str, start_time: float, end_time: float, ou
         "--youtube-skip-dash-manifest"
     ]
     
-    if os.path.exists("cookies.txt"):
-        bypass_flags.extend(["--cookies", "cookies.txt"])
+    # Only add cookies if not using iOS/Android as it confuses yt-dlp
+    # if os.path.exists("cookies.txt"):
+    #     bypass_flags.extend(["--cookies", "cookies.txt"])
     
     # We download 1080p or 720p mp4 video
     cmd = [
