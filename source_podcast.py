@@ -29,13 +29,18 @@ def fetch_latest_episode_audio(channel_url: str):
     print(f"Fetching latest episode from {channel_url}...")
     
     # Bypass flags for GitHub Actions
+    # We use a mix of clients: TV and Web_Embedded are often more stable for downloads
+    # while standard 'web' and 'mweb' work well with cookies.
+    # Note: 'ios' and 'android' clients do NOT support cookies and are skipped by yt-dlp if --cookies is present.
     bypass_flags = [
         "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "--extractor-args", "youtube:player-client=ios,android,web_creator",
+        "--extractor-args", "youtube:player_client=tv,mweb,web_embedded,web",
         "--add-header", "Accept-Language:en-US,en;q=0.9",
         "--add-header", "Origin:https://www.youtube.com",
         "--add-header", "Referer:https://www.youtube.com/",
-        "--no-check-certificates"
+        "--no-check-certificates",
+        "--prefer-free-formats",
+        "--youtube-skip-dash-manifest" # Often helps with signature errors
     ]
     
     if os.path.exists("cookies.txt"):
@@ -110,14 +115,16 @@ def download_video_segment(video_id: str, start_time: float, end_time: float, ou
     url = f"https://www.youtube.com/watch?v={video_id}"
     print(f"Downloading video segment {start_time} - {end_time}...")
     
-    # Bypass flags for GitHub Actions
+    # Bypass flags (Synchronized with fetch_latest_episode_audio)
     bypass_flags = [
         "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "--extractor-args", "youtube:player-client=ios,android,web_creator",
+        "--extractor-args", "youtube:player_client=tv,mweb,web_embedded,web",
         "--add-header", "Accept-Language:en-US,en;q=0.9",
         "--add-header", "Origin:https://www.youtube.com",
         "--add-header", "Referer:https://www.youtube.com/",
-        "--no-check-certificates"
+        "--no-check-certificates",
+        "--prefer-free-formats",
+        "--youtube-skip-dash-manifest"
     ]
     
     if os.path.exists("cookies.txt"):
