@@ -34,13 +34,13 @@ def fetch_latest_episode_audio(channel_url: str):
     # Note: 'ios' and 'android' clients do NOT support cookies and are skipped by yt-dlp if --cookies is present.
     bypass_flags = [
         "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "--extractor-args", "youtube:player_client=tv,mweb,web_embedded,web",
+        "--extractor-args", "youtube:player-client=tv,web_embedded",
         "--add-header", "Accept-Language:en-US,en;q=0.9",
         "--add-header", "Origin:https://www.youtube.com",
         "--add-header", "Referer:https://www.youtube.com/",
         "--no-check-certificates",
         "--prefer-free-formats",
-        "--youtube-skip-dash-manifest" # Often helps with signature errors
+        "--youtube-skip-dash-manifest"
     ]
     
     if os.path.exists("cookies.txt"):
@@ -118,7 +118,7 @@ def download_video_segment(video_id: str, start_time: float, end_time: float, ou
     # Bypass flags (Synchronized with fetch_latest_episode_audio)
     bypass_flags = [
         "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "--extractor-args", "youtube:player_client=tv,mweb,web_embedded,web",
+        "--extractor-args", "youtube:player-client=tv,web_embedded",
         "--add-header", "Accept-Language:en-US,en;q=0.9",
         "--add-header", "Origin:https://www.youtube.com",
         "--add-header", "Referer:https://www.youtube.com/",
