@@ -1,0 +1,26 @@
+# Environment & Secrets
+.env
+cookies.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+build/
+dist/
+*.egg-info/
+
+# Databases
+*.db
+*.sqlite
+
+# Application Specific
+logs/
+data/
+output/
+assets/satisfying.mp4
+
+# OS
+.DS_Store
+Thumbs.db

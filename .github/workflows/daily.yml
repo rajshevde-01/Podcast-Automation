@@ -47,8 +47,17 @@ jobs:
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
+          mkdir -p logs
           python main.py
+
+      - name: Upload Logs & Debug Info
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pipeline-logs
+          path: logs/
 
       - name: Upload Database Tracker Artifact
         uses: actions/upload-artifact@v4
