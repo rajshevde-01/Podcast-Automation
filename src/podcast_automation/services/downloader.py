@@ -15,15 +15,20 @@ class DownloadService:
             'no_warnings': True,
             'noprogress': True,
             'extract_flat': False,
-            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
             'add_header': [
-                'Accept-Language:en-US,en;q=0.9',
-                'Origin:https://www.youtube.com',
-                'Referer:https://www.youtube.com/'
+                'Accept-Language: en-US,en;q=0.9',
+                'Origin: https://www.youtube.com',
+                'Referer: https://www.youtube.com/',
+                'Sec-Fetch-Mode: navigate',
+                'Sec-Fetch-Site: same-origin',
+                'Sec-Fetch-Dest: document',
+                'Upgrade-Insecure-Requests: 1'
             ],
             'nocheckcertificate': True,
             'prefer_free_formats': True,
             'youtube_include_dash_manifest': False,
+            'geo_bypass': True,
         }
         if os.path.exists(self.cookies_path):
             self.base_opts['cookiefile'] = self.cookies_path
@@ -56,16 +61,16 @@ class DownloadService:
         logger.info(f"Fetching latest episode from {channel_url}...")
         
         profiles = [
+            {"name": "iOS App", "args": "youtube:player-client=ios"},
+            {"name": "Android App", "args": "youtube:player-client=android"},
             {"name": "Web/MWeb", "args": "youtube:player-client=web,mweb"},
             {"name": "TV/Embedded", "args": "youtube:player-client=tv,web_embedded"},
-            {"name": "Android", "args": "youtube:player-client=android"},
-            {"name": "iOS", "args": "youtube:player-client=ios"},
         ]
         
         for profile in profiles:
             opts = self.base_opts.copy()
             opts['extractor_args'] = profile['args']
-            opts['playlist_items'] = '5' # Fetch 5 latest to find valid one
+            opts['playlist_items'] = '5'
             
             try:
                 with yt_dlp.YoutubeDL(opts) as ydl:
@@ -83,10 +88,12 @@ class DownloadService:
                         logger.warning(f"No long-form episodes found in the last 5 uploads for {channel_url}")
                         return None
             except Exception as e:
-                logger.warning(f"Profile {profile['name']} failed: {str(e)[:100]}")
+                # Capture a more descriptive error message
+                error_msg = str(e).split('\n')[0]
+                logger.warning(f"Profile {profile['name']} failed: {error_msg}")
                 continue
         
-        logger.error("All bypass profiles failed to fetch metadata.")
+        logger.error("🛑 ALL bypass profiles failed to fetch metadata. YouTube is likely blocking this runner.")
         return None
 
     def download_audio(self, video_id: str) -> Optional[str]:
