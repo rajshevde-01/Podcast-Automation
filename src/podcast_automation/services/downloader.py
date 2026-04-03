@@ -122,10 +122,10 @@ class DownloadService:
         logger.info(f"RSS failed or unavailable. Falling back to yt-dlp for {channel_url}...")
         
         profiles = [
-            {"name": "iOS App", "args": "youtube:player-client=ios"},
-            {"name": "Android App", "args": "youtube:player-client=android"},
-            {"name": "Web/MWeb", "args": "youtube:player-client=web,mweb"},
-            {"name": "TV/Embedded", "args": "youtube:player-client=tv,web_embedded"},
+            {"name": "iOS App", "args": {'youtube': {'player_client': ['ios']}}},
+            {"name": "Android App", "args": {'youtube': {'player_client': ['android']}}},
+            {"name": "Web/MWeb", "args": {'youtube': {'player_client': ['web', 'mweb']}}},
+            {"name": "TV/Embedded", "args": {'youtube': {'player_client': ['tv', 'web_embedded']}}},
         ]
         
         for profile in profiles:
@@ -166,7 +166,7 @@ class DownloadService:
         opts.update({
             'format': 'bestaudio[ext=m4a]/bestaudio',
             'outtmpl': output_path,
-            'extractor_args': 'youtube:player-client=ios',
+            'extractor_args': {'youtube': {'player_client': ['ios']}},
         })
         
         url = f"https://www.youtube.com/watch?v={video_id}"
@@ -191,7 +191,7 @@ class DownloadService:
             'outtmpl': output_path,
             'download_sections': f"*{start_time}-{end_time}",
             'force_keyframes_at_cuts': True,
-            'extractor_args': 'youtube:player-client=ios',
+            'extractor_args': {'youtube': {'player_client': ['ios']}},
         })
         
         url = f"https://www.youtube.com/watch?v={video_id}"
