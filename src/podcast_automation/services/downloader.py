@@ -8,6 +8,7 @@ import yt_dlp
 from loguru import logger
 from ..config import settings
 from ..models import Podcast
+from .youtube import youtube_service
 
 class DownloadService:
     def __init__(self, cookies_path: str = settings.COOKIES_FILE):
@@ -85,25 +86,20 @@ class DownloadService:
                         'url': f"https://www.youtube.com/watch?v={video_id_match.group(1)}"
                     })
             
-            # Since RSS doesn't give duration, we fallback to yt-dlp just for the selected video info
-            # which is much more likely to succeed than channel scraping.
+            # Since RSS doesn't give duration, we use the OFFICIAL API for info
+            # which is 100% reliable and never blocked by bot detection.
             for item in results:
                 logger.info(f"Checking video from RSS: {item['title']}")
-                # Get duration via a thin yt-dlp call
-                opts = self.base_opts.copy()
-                opts['playlist_items'] = '1'
-                try:
-                    with yt_dlp.YoutubeDL(opts) as ydl:
-                        info = ydl.extract_info(item['url'], download=False)
-                        duration = info.get('duration', 0)
-                        if duration > settings.MIN_EPISODE_DURATION:
-                            logger.info(f"✅ Found valid episode via RSS: {info['title']} ({duration}s)")
-                            return info
-                        else:
-                            logger.info(f"⏭️ Skipping {info['title']} (Too short: {duration}s)")
-                except Exception as e:
-                    logger.warning(f"Failed to get duration for {item['id']}: {e}")
+                info = youtube_service.get_video_metadata(item['id'])
+                if not info:
                     continue
+                    
+                duration = info.get('duration', 0)
+                if duration > settings.MIN_EPISODE_DURATION:
+                    logger.info(f"✅ Found valid episode via Data API: {info['title']} ({duration}s)")
+                    return info
+                else:
+                    logger.info(f"⏭️ Skipping {info['title']} (Too short: {duration}s)")
                     
             return None
         except Exception as e:

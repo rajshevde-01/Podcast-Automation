@@ -1,5 +1,7 @@
 import os
-from typing import List, Optional
+import re
+import isodate
+from typing import List, Optional, Dict
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
@@ -32,12 +34,48 @@ class YouTubeService:
             self._youtube = build("youtube", "v3", credentials=creds)
         return self._youtube
 
+    def get_video_metadata(self, video_id: str) -> Optional[Dict]:
+        """
+        Fetches official metadata for a video using the YouTube Data API.
+        This is much more reliable than scraping in automated environments.
+        """
+        logger.info(f"Fetching Official API Metadata for: {video_id}")
+        try:
+            request = self.youtube.videos().list(
+                part="snippet,contentDetails",
+                id=video_id
+            )
+            response = request.execute()
+            
+            if not response.get("items"):
+                logger.warning(f"No video found for ID: {video_id}")
+                return None
+                
+            item = response["items"][0]
+            snippet = item["snippet"]
+            content_details = item["contentDetails"]
+            
+            # Parse ISO 8601 duration (e.g., PT1H2M3S) to seconds
+            duration_iso = content_details.get("duration")
+            duration_seconds = int(isodate.parse_duration(duration_iso).total_seconds())
+            
+            return {
+                "id": video_id,
+                "title": snippet.get("title"),
+                "description": snippet.get("description"),
+                "duration": duration_seconds,
+                "thumbnail": snippet.get("thumbnails", {}).get("high", {}).get("url")
+            }
+        except Exception as e:
+            logger.error(f"YouTube Data API Metadata Fetch Failed: {e}")
+            return None
+
     def upload_video(self,
-                     file_path: str,
-                     title: str,
-                     description: str,
-                     tags: List[str],
-                     thumbnail_path: Optional[str] = None) -> Optional[str]:
+                      file_path: str,
+                      title: str,
+                      description: str,
+                      tags: List[str],
+                      thumbnail_path: Optional[str] = None) -> Optional[str]:
         
         logger.info(f"Uploading Video: {title}")
         

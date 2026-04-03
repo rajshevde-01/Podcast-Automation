@@ -10,7 +10,7 @@ from .services.processor import processor
 from .services.llm_curator import curator
 from .services.video_engine import video_service
 from .services.thumbnail_engine import thumbnail_service
-from .services.uploader import youtube_service
+from .services.youtube import youtube_service
 
 class AutomationPipeline:
     def __init__(self, dry_run: bool = False):
