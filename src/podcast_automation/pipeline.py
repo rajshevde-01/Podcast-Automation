@@ -41,7 +41,7 @@ class AutomationPipeline:
 
             logger.info(f"Selected Podcast: {podcast.name}")
             
-            episode_meta = downloader.fetch_latest_episode(podcast.url)
+            episode_meta = downloader.fetch_latest_episode(podcast)
             if not episode_meta:
                 logger.warning(f"No new episodes found for {podcast.name}.")
                 return

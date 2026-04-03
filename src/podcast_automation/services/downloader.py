@@ -1,6 +1,8 @@
 import os
 import json
 import random
+import re
+import requests
 from typing import Optional, Tuple, Dict
 import yt_dlp
 from loguru import logger
@@ -54,11 +56,74 @@ class DownloadService:
             
         return Podcast(**choice)
 
-    def fetch_latest_episode(self, channel_url: str) -> Optional[Dict]:
+    def _fetch_from_rss(self, channel_id: str) -> Optional[Dict]:
+        """
+        Fetches the latest videos using YouTube's RSS feed.
+        """
+        rss_url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
+        logger.info(f"Fetching RSS feed: {rss_url}")
+        
+        try:
+            response = requests.get(rss_url, timeout=10)
+            response.raise_for_status()
+            xml_content = response.text
+            
+            # Simple regex parsing for entries to avoid feedparser dependency
+            entries = re.findall(r'<entry>(.*?)</entry>', xml_content, re.DOTALL)
+            if not entries:
+                return None
+                
+            results = []
+            for entry in entries:
+                video_id_match = re.search(r'<yt:videoId>(.*?)</yt:videoId>', entry)
+                title_match = re.search(r'<title>(.*?)</title>', entry)
+                
+                if video_id_match and title_match:
+                    results.append({
+                        'id': video_id_match.group(1),
+                        'title': title_match.group(1),
+                        'url': f"https://www.youtube.com/watch?v={video_id_match.group(1)}"
+                    })
+            
+            # Since RSS doesn't give duration, we fallback to yt-dlp just for the selected video info
+            # which is much more likely to succeed than channel scraping.
+            for item in results:
+                logger.info(f"Checking video from RSS: {item['title']}")
+                # Get duration via a thin yt-dlp call
+                opts = self.base_opts.copy()
+                opts['playlist_items'] = '1'
+                try:
+                    with yt_dlp.YoutubeDL(opts) as ydl:
+                        info = ydl.extract_info(item['url'], download=False)
+                        duration = info.get('duration', 0)
+                        if duration > settings.MIN_EPISODE_DURATION:
+                            logger.info(f"✅ Found valid episode via RSS: {info['title']} ({duration}s)")
+                            return info
+                        else:
+                            logger.info(f"⏭️ Skipping {info['title']} (Too short: {duration}s)")
+                except Exception as e:
+                    logger.warning(f"Failed to get duration for {item['id']}: {e}")
+                    continue
+                    
+            return None
+        except Exception as e:
+            logger.error(f"RSS Fetch Error: {e}")
+            return None
+
+    def fetch_latest_episode(self, podcast: Podcast) -> Optional[Dict]:
         """
         Fetches metadata for the latest episode from a channel.
+        Tries RSS first, then falls back to yt-dlp profiles.
         """
-        logger.info(f"Fetching latest episode from {channel_url}...")
+        # 1. Try RSS First (Most reliable in Actions)
+        if podcast.channel_id:
+            entry = self._fetch_from_rss(podcast.channel_id)
+            if entry:
+                return entry
+        
+        # 2. Fallback to yt-dlp bypass profiles
+        channel_url = podcast.url
+        logger.info(f"RSS failed or unavailable. Falling back to yt-dlp for {channel_url}...")
         
         profiles = [
             {"name": "iOS App", "args": "youtube:player-client=ios"},
