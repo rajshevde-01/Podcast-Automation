@@ -58,7 +58,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
         run: |
-          echo "$YOUTUBE_COOKIES" > cookies.txt
+          python -c 'import os; open("cookies.txt", "w", encoding="utf-8").write(os.environ.get("YOUTUBE_COOKIES", "") + "\n")'
           mkdir -p logs
           python main.py
 

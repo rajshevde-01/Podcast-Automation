@@ -166,6 +166,7 @@ class DownloadService:
         opts.update({
             'format': 'bestaudio[ext=m4a]/bestaudio',
             'outtmpl': output_path,
+            'extractor_args': 'youtube:player-client=ios',
         })
         
         url = f"https://www.youtube.com/watch?v={video_id}"
@@ -190,6 +191,7 @@ class DownloadService:
             'outtmpl': output_path,
             'download_sections': f"*{start_time}-{end_time}",
             'force_keyframes_at_cuts': True,
+            'extractor_args': 'youtube:player-client=ios',
         })
         
         url = f"https://www.youtube.com/watch?v={video_id}"
