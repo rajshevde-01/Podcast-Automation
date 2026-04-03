@@ -65,16 +65,23 @@ class DownloadService:
         for profile in profiles:
             opts = self.base_opts.copy()
             opts['extractor_args'] = profile['args']
-            opts['playlist_items'] = '1'
-            opts['match_filter'] = lambda info, *args, **kwargs: None if info.get('duration', 0) > settings.MIN_EPISODE_DURATION else 'Too short'
+            opts['playlist_items'] = '5' # Fetch 5 latest to find valid one
             
             try:
                 with yt_dlp.YoutubeDL(opts) as ydl:
                     info = ydl.extract_info(channel_url, download=False)
-                    if 'entries' in info:
-                        entry = info['entries'][0]
-                        logger.info(f"✅ Success with profile {profile['name']}! Found: {entry['title']}")
-                        return entry
+                    if 'entries' in info and len(info['entries']) > 0:
+                        for entry in info['entries']:
+                            if not entry: continue
+                            duration = entry.get('duration', 0)
+                            if duration > settings.MIN_EPISODE_DURATION:
+                                logger.info(f"✅ Success with profile {profile['name']}! Found: {entry['title']} ({duration}s)")
+                                return entry
+                            else:
+                                logger.info(f"⏭️ Skipping {entry['title']} (Too short: {duration}s)")
+                        
+                        logger.warning(f"No long-form episodes found in the last 5 uploads for {channel_url}")
+                        return None
             except Exception as e:
                 logger.warning(f"Profile {profile['name']} failed: {str(e)[:100]}")
                 continue

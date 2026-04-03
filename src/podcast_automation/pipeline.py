@@ -122,6 +122,8 @@ class AutomationPipeline:
                     except Exception as e:
                         logger.warning(f"Cleanup failed for {f}: {e}")
 
+            logger.info("🏁 Pipeline finished processing.")
+
         except Exception as e:
             logger.exception(f"PIPELINE CRITICAL ERROR: {e}")
             sys.exit(1)
