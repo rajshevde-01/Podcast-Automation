@@ -33,31 +33,39 @@ class AutomationPipeline:
         logger.info("🚀 Starting Podcast Shorts Automation Pipeline")
         
         try:
-            # 1. Source Podcast
-            podcast = downloader.get_random_podcast()
-            if not podcast:
-                logger.error("❌ No podcasts found in list.")
-                sys.exit(1)
+            # Try up to 5 different podcasts in case one fails
+            for attempt in range(5):
+                podcast = downloader.get_random_podcast()
+                if not podcast:
+                    logger.error("❌ No podcasts found in list.")
+                    sys.exit(1)
 
-            logger.info(f"Selected Podcast: {podcast.name}")
-            
-            episode_meta = downloader.fetch_latest_episode(podcast)
-            if not episode_meta:
-                logger.error(f"❌ FAILED: Could not fetch any episode for {podcast.name}. "
-                             "Check if YouTube API key is set and refresh token is valid.")
-                sys.exit(1)
+                logger.info(f"🔄 Attempt {attempt + 1}: Selected Podcast: {podcast.name}")
+                
+                episode_meta = downloader.fetch_latest_episode(podcast)
+                if not episode_meta:
+                    logger.warning(f"⚠️ Could not fetch episode for {podcast.name}. Trying another channel...")
+                    continue
 
-            video_id = episode_meta['id']
-            title = episode_meta['title']
+                video_id = episode_meta['id']
+                title = episode_meta['title']
 
-            if db_manager.is_episode_processed(video_id):
-                logger.info(f"Episode {video_id} already processed. Skipping.")
-                return
+                if db_manager.is_episode_processed(video_id):
+                    logger.info(f"Episode {video_id} already processed. Skipping to next podcast.")
+                    continue
 
-            # 2. Extract Highlight
-            audio_path = downloader.download_audio(video_id)
-            if not audio_path:
-                logger.error("❌ FAILED: Could not download audio.")
+                # 2. Extract Highlight
+                audio_path = downloader.download_audio(video_id)
+                if not audio_path:
+                    logger.error("❌ FAILED: Could not download audio for this episode. Trying another...")
+                    continue
+                    
+                # If we got audio successfully, break out of retry loop and proceed
+                break
+                
+            else:
+                # If the loop finished without breaking, ALL 5 attempts failed
+                logger.error("❌ FAILED: All 5 podcast attempts failed. Check logs.")
                 sys.exit(1)
 
             transcript = processor.transcribe(audio_path)
