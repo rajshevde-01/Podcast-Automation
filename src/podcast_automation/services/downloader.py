@@ -137,6 +137,7 @@ class DownloadService:
         logger.info(f"RSS failed or unavailable. Falling back to yt-dlp for {channel_url}...")
         
         profiles = [
+            {"name": "Default Auth", "args": {}},
             {"name": "iOS App", "args": {'youtube': {'player_client': ['ios']}}},
             {"name": "Android App", "args": {'youtube': {'player_client': ['android']}}},
             {"name": "Web/MWeb", "args": {'youtube': {'player_client': ['web', 'mweb']}}},
