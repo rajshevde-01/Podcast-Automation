@@ -180,8 +180,9 @@ class DownloadService:
             
         opts = self.base_opts.copy()
         opts.update({
-            'format': 'bestaudio[ext=m4a]/bestaudio',
+            'format': 'bestaudio[ext=m4a]/bestaudio/best/b',
             'outtmpl': output_path,
+            'extractor_args': {'youtube': {'player_client': ['android']}},
         })
         
         url = f"https://www.youtube.com/watch?v={video_id}"
@@ -202,10 +203,11 @@ class DownloadService:
             
         opts = self.base_opts.copy()
         opts.update({
-            'format': 'bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best',
+            'format': 'bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4]/best/b',
             'outtmpl': output_path,
             'download_sections': f"*{start_time}-{end_time}",
             'force_keyframes_at_cuts': True,
+            'extractor_args': {'youtube': {'player_client': ['android']}},
         })
         
         url = f"https://www.youtube.com/watch?v={video_id}"
