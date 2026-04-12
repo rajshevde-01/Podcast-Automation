@@ -36,15 +36,16 @@ class AutomationPipeline:
             # 1. Source Podcast
             podcast = downloader.get_random_podcast()
             if not podcast:
-                logger.error("No podcasts found in list.")
-                return
+                logger.error("❌ No podcasts found in list.")
+                sys.exit(1)
 
             logger.info(f"Selected Podcast: {podcast.name}")
             
             episode_meta = downloader.fetch_latest_episode(podcast)
             if not episode_meta:
-                logger.warning(f"No new episodes found for {podcast.name}.")
-                return
+                logger.error(f"❌ FAILED: Could not fetch any episode for {podcast.name}. "
+                             "Check if YouTube API key is set and refresh token is valid.")
+                sys.exit(1)
 
             video_id = episode_meta['id']
             title = episode_meta['title']
@@ -56,20 +57,22 @@ class AutomationPipeline:
             # 2. Extract Highlight
             audio_path = downloader.download_audio(video_id)
             if not audio_path:
-                return
+                logger.error("❌ FAILED: Could not download audio.")
+                sys.exit(1)
 
             transcript = processor.transcribe(audio_path)
             highlight = curator.find_best_highlight(transcript)
             
             if not highlight:
-                logger.error("Could not find a viral highlight.")
-                return
+                logger.error("❌ FAILED: Could not find a viral highlight.")
+                sys.exit(1)
 
             # 3. Process Video
             logger.info(f"Targeting highlight: {highlight.start_time}s - {highlight.end_time}s")
             segment_path = downloader.download_video_segment(video_id, highlight.start_time, highlight.end_time)
             if not segment_path:
-                return
+                logger.error("❌ FAILED: Could not download video segment.")
+                sys.exit(1)
 
             # Get word-level timestamps for kinetic text
             word_segments = processor.transcribe(segment_path, word_timestamps=True)
@@ -113,6 +116,9 @@ class AutomationPipeline:
                 db_manager.mark_short_uploaded(short_id, upload_url)
                 self._send_discord_notification(highlight.title, upload_url)
                 logger.info(f"✅ Pipeline Completed Successfully! {upload_url}")
+            else:
+                logger.error("❌ FAILED: YouTube upload returned no URL. Check OAuth token!")
+                sys.exit(1)
             
             # 6. Cleanup
             for f in [audio_path, segment_path, final_video_path, thumbnail_path]:
@@ -124,6 +130,8 @@ class AutomationPipeline:
 
             logger.info("🏁 Pipeline finished processing.")
 
+        except SystemExit:
+            raise  # Re-raise sys.exit calls
         except Exception as e:
             logger.exception(f"PIPELINE CRITICAL ERROR: {e}")
             sys.exit(1)

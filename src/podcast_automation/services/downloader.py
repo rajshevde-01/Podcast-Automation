@@ -88,18 +88,33 @@ class DownloadService:
             
             # Since RSS doesn't give duration, we use the OFFICIAL API for info
             # which is 100% reliable and never blocked by bot detection.
+            metadata_failures = 0
             for item in results:
                 logger.info(f"Checking video from RSS: {item['title']}")
                 info = youtube_service.get_video_metadata(item['id'])
                 if not info:
+                    metadata_failures += 1
                     continue
                     
                 duration = info.get('duration', 0)
-                if duration > settings.MIN_EPISODE_DURATION:
+                
+                # If duration is 0 (oEmbed fallback — no duration available),
+                # accept it if the title suggests a full episode (not "clip"/"shorts")
+                if duration == 0:
+                    title_lower = item['title'].lower()
+                    if any(skip_word in title_lower for skip_word in ['clip', 'shorts', 'short', 'trailer', 'teaser']):
+                        logger.info(f"⏭️ Skipping {item['title']} (Looks like a clip, no duration data)")
+                        continue
+                    logger.info(f"✅ Accepting episode via fallback (no duration data): {info['title']}")
+                    return info
+                elif duration > settings.MIN_EPISODE_DURATION:
                     logger.info(f"✅ Found valid episode via Data API: {info['title']} ({duration}s)")
                     return info
                 else:
                     logger.info(f"⏭️ Skipping {info['title']} (Too short: {duration}s)")
+            
+            if metadata_failures == len(results):
+                logger.error("⚠️ ALL metadata calls failed. Check YOUTUBE_API_KEY or YOUTUBE_REFRESH_TOKEN!")
                     
             return None
         except Exception as e:
