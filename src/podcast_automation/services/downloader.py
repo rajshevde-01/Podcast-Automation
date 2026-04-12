@@ -3,6 +3,7 @@ import json
 import random
 import re
 import requests
+import subprocess
 from typing import Optional, Tuple, Dict
 import yt_dlp
 from loguru import logger
@@ -191,9 +192,45 @@ class DownloadService:
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 ydl.download([url])
+                
+            if os.path.exists(output_path):
                 return output_path
+                
         except Exception as e:
-            logger.error(f"Failed to download audio: {e}")
+            logger.warning(f"yt-dlp auto-failed ({e}). Initializing Cobalt API fallback...")
+            
+            try:
+                # Fallback to Cobalt public instance (bypasses YouTube IP bans natively)
+                cobalt_url = "https://co.wuk.sh/api/json"
+                payload = {
+                    "url": url,
+                    "isAudioOnly": True,
+                    "aFormat": "mp3", 
+                    "isNoTTWatermark": True
+                }
+                headers = {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                }
+                res = requests.post(cobalt_url, json=payload, headers=headers, timeout=30)
+                res.raise_for_status()
+                data = res.json()
+                
+                if data.get("status") in ["stream", "redirect", "picker"] and data.get("url"):
+                    stream_url = data["url"]
+                    logger.info("Cobalt accepted query. Retrieving direct stream...")
+                    audio_res = requests.get(stream_url, stream=True, timeout=60)
+                    audio_res.raise_for_status()
+                    with open(output_path, 'wb') as f:
+                        for chunk in audio_res.iter_content(chunk_size=1024*1024):
+                            f.write(chunk)
+                    return output_path
+                else:
+                    logger.error(f"Cobalt api failed to extract stream: {data}")
+            except Exception as cobalt_err:
+                logger.error(f"Cobalt fallback proxy crashed: {cobalt_err}")
+                
+            logger.error(f"Critical Failure: Both yt-dlp and Cobalt proxy failed to download audio.")
             return None
 
     def download_video_segment(self, video_id: str, start_time: float, end_time: float) -> Optional[str]:
@@ -216,9 +253,53 @@ class DownloadService:
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 ydl.download([url])
+                
+            if os.path.exists(output_path):
                 return output_path
+                
         except Exception as e:
-            logger.error(f"Failed to download video segment: {e}")
+            logger.warning(f"yt-dlp video segment download failed ({e}). Initializing Cobalt API fallback...")
+            
+            try:
+                # Fallback to Cobalt public instance for video stream
+                cobalt_url = "https://co.wuk.sh/api/json"
+                payload = {
+                    "url": url,
+                    "isAudioOnly": False,
+                    "vQuality": "1080", 
+                    "isNoTTWatermark": True
+                }
+                headers = {"Accept": "application/json", "Content-Type": "application/json"}
+                
+                res = requests.post(cobalt_url, json=payload, headers=headers, timeout=30)
+                res.raise_for_status()
+                data = res.json()
+                
+                if data.get("status") in ["stream", "redirect", "picker"] and data.get("url"):
+                    stream_url = data["url"]
+                    logger.info("Cobalt accepted query. Slicing stream via FFmpeg...")
+                    
+                    # Cut exactly the segment we need via ffmpeg network stream
+                    cmd = [
+                        "ffmpeg", "-y", 
+                        "-ss", str(start_time), 
+                        "-to", str(end_time), 
+                        "-i", stream_url, 
+                        "-c:v", "libx264", "-c:a", "aac", 
+                        "-avoid_negative_ts", "make_zero",
+                        output_path
+                    ]
+                    
+                    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    
+                    if os.path.exists(output_path):
+                        return output_path
+                else:
+                    logger.error(f"Cobalt api failed to extract video stream: {data}")
+            except Exception as cobalt_err:
+                logger.error(f"Cobalt fallback proxy crashed: {cobalt_err}")
+                
+            logger.error(f"Critical Failure: Both yt-dlp and Cobalt proxy failed to download video segment.")
             return None
 
 downloader = DownloadService()
