@@ -100,7 +100,7 @@ def main():
     
     print()
     print("=" * 60)
-    print("✅ SUCCESS! Here are your new credentials:")
+    print("SUCCESS! Here are your new credentials:")
     print("=" * 60)
     print()
     print(f"REFRESH TOKEN:\n{credentials.refresh_token}")
