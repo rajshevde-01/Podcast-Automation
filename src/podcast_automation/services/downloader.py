@@ -256,7 +256,7 @@ class DownloadService:
                     "-c:v", "libx264", "-preset", "veryfast", "-c:a", "aac",
                     output_path
                 ]
-                subprocess.run(cmd, check=True, capture_output=True)
+                subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 if os.path.exists(output_path): return output_path
         except Exception as e:
             logger.warning(f"Segment Layer 2 Failed: {e}")
@@ -270,7 +270,7 @@ class DownloadService:
             if data.get("url"):
                 stream_url = data["url"]
                 cmd = ["ffmpeg", "-y", "-ss", str(start_time), "-t", str(duration), "-i", stream_url, "-c", "copy", output_path]
-                subprocess.run(cmd, check=True)
+                subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 if os.path.exists(output_path): return output_path
         except Exception as e:
             logger.error(f"Segment Layer 3 Failed: {e}")
