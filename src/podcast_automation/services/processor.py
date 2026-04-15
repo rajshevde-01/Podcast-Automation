@@ -1,12 +1,17 @@
 from typing import List, Dict
+import os
 from faster_whisper import WhisperModel
 from ..config import settings
 from loguru import logger
 
 class TranscriptionService:
-    def __init__(self, model_size: str = settings.WHISPER_MODEL):
+    def __init__(self, model_size: str = settings.WHISPER_MODEL, device: str = settings.WHISPER_DEVICE):
         self.model_size = model_size
+        self.device = device
         self._model = None
+        # Set local cache dir to avoid permission issues with system .cache
+        os.environ["HF_HOME"] = str(settings.DATA_DIR / "cache")
+        os.environ["XDG_CACHE_HOME"] = str(settings.DATA_DIR / "cache")
 
     @property
     def model(self):

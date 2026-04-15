@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import requests
+import subprocess
 from loguru import logger
 from .config import settings
 from .database import db_manager
@@ -16,8 +17,17 @@ class AutomationPipeline:
     def __init__(self, dry_run: bool = False):
         self.dry_run = dry_run
         # Set up logging
-        log_file = settings.BASE_DIR / "logs" / "pipeline_{time}.log"
+        log_dir = settings.BASE_DIR / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_file = log_dir / "pipeline_{time}.log"
         logger.add(log_file, rotation="10 MB", retention="10 days", level="INFO")
+        
+        # Check for ffmpeg
+        try:
+            subprocess.run(["ffmpeg", "-version"], capture_output=True, check=True)
+            logger.info("✅ ffmpeg found and ready.")
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            logger.warning("⚠️ ffmpeg not found in PATH. Video slicing and rendering may fail.")
 
     def _send_discord_notification(self, title: str, url: str):
         if not settings.DISCORD_WEBHOOK_URL:
