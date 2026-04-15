@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     YOUTUBE_REFRESH_TOKEN: Optional[str] = None
     YOUTUBE_API_KEY: Optional[str] = None
     DISCORD_WEBHOOK_URL: Optional[str] = None
+    RAPID_API_KEY: Optional[str] = None
 
     # Paths
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent

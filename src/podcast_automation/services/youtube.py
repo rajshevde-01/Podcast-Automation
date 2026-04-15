@@ -211,9 +211,24 @@ class YouTubeService:
         """
         logger.info(f"Fetching latest videos for channel: {channel_id}")
         try:
-            # 1. Get the uploads playlist ID (UC... -> UU...)
-            uploads_playlist_id = "UU" + channel_id[2:]
+            # 1. Get the uploads playlist ID (UC... -> UU... is the common case but not guaranteed)
+            # Use channels.list to get the correct uploads playlist ID
+            url_channel = "https://www.googleapis.com/youtube/v3/channels"
+            params_channel = {
+                "part": "contentDetails",
+                "id": channel_id,
+                "key": self.api_key,
+            }
+            res_channel = http_requests.get(url_channel, params=params_channel, timeout=10)
+            res_channel.raise_for_status()
+            data_channel = res_channel.json()
             
+            if not data_channel.get("items"):
+                logger.warning(f"No channel found for ID: {channel_id}. Trying UU shortcut fallback...")
+                uploads_playlist_id = "UU" + channel_id[2:]
+            else:
+                uploads_playlist_id = data_channel["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
             # 2. List playlist items
             url = "https://www.googleapis.com/youtube/v3/playlistItems"
             params = {

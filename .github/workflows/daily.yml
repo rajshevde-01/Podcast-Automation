@@ -58,6 +58,7 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
+          RAPID_API_KEY: ${{ secrets.RAPID_API_KEY }}
         run: |
           python -c 'import os; open("cookies.txt", "w", encoding="utf-8").write(os.environ.get("YOUTUBE_COOKIES", "") + "\n")'
           mkdir -p logs
