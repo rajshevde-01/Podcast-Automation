@@ -204,4 +204,42 @@ class YouTubeService:
         except Exception as e:
             logger.warning(f"Thumbnail Upload Failed: {e}")
 
+    def get_channel_latest_videos(self, channel_id: str, max_results: int = 5) -> List[Dict]:
+        """
+        Fetches the latest videos from a channel using the official Data API.
+        Highly reliable and bypasses all scraping blocks.
+        """
+        logger.info(f"Fetching latest videos for channel: {channel_id}")
+        try:
+            # 1. Get the uploads playlist ID (UC... -> UU...)
+            uploads_playlist_id = "UU" + channel_id[2:]
+            
+            # 2. List playlist items
+            url = "https://www.googleapis.com/youtube/v3/playlistItems"
+            params = {
+                "part": "snippet,contentDetails",
+                "playlistId": uploads_playlist_id,
+                "maxResults": max_results,
+                "key": self.api_key,
+            }
+            response = http_requests.get(url, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            videos = []
+            for item in data.get("items", []):
+                snippet = item["snippet"]
+                content_details = item["contentDetails"]
+                video_id = content_details["videoId"]
+                videos.append({
+                    "id": video_id,
+                    "title": snippet["title"],
+                    "url": f"https://www.youtube.com/watch?v={video_id}"
+                })
+            
+            return videos
+        except Exception as e:
+            logger.error(f"Official Channel Fetch Failed: {e}")
+            return []
+
 youtube_service = YouTubeService()
