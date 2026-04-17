@@ -6,6 +6,7 @@ class Podcast(BaseModel):
     channel_id: Optional[str] = None
     url: str
     theme: Optional[str] = None
+    rss_feed: Optional[str] = None  # Podcast audio RSS feed URL (enables cookie-free audio download)
 
 class Episode(BaseModel):
     id: str

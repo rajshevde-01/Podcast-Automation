@@ -21,13 +21,63 @@ class AutomationPipeline:
         log_dir.mkdir(parents=True, exist_ok=True)
         log_file = log_dir / "pipeline_{time}.log"
         logger.add(log_file, rotation="10 MB", retention="10 days", level="INFO")
-        
+
         # Check for ffmpeg
         try:
             subprocess.run(["ffmpeg", "-version"], capture_output=True, check=True)
             logger.info("✅ ffmpeg found and ready.")
         except (subprocess.CalledProcessError, FileNotFoundError):
             logger.warning("⚠️ ffmpeg not found in PATH. Video slicing and rendering may fail.")
+
+    def _validate_secrets(self):
+        """
+        Fail fast if required secrets are missing before any expensive work starts.
+        Warns (but does not fail) for optional secrets that improve reliability.
+        """
+        missing_upload = [
+            name
+            for name, val in [
+                ("YOUTUBE_CLIENT_ID", settings.YOUTUBE_CLIENT_ID),
+                ("YOUTUBE_CLIENT_SECRET", settings.YOUTUBE_CLIENT_SECRET),
+                ("YOUTUBE_REFRESH_TOKEN", settings.YOUTUBE_REFRESH_TOKEN),
+            ]
+            if not val
+        ]
+        if missing_upload and not self.dry_run:
+            logger.error(
+                f"❌ MISSING REQUIRED UPLOAD SECRETS: {', '.join(missing_upload)}. "
+                "Set these as GitHub Actions secrets. The pipeline cannot upload "
+                "without YouTube OAuth credentials."
+            )
+            sys.exit(1)
+
+        if not settings.RAPID_API_KEY:
+            logger.warning(
+                "⚠️  RAPID_API_KEY is not set. The RapidAPI download layer will be "
+                "skipped. Podcasts without an 'rss_feed' entry will rely on yt-dlp, "
+                "which may fail with YouTube bot-detection in CI. "
+                "Set RAPID_API_KEY in GitHub Actions secrets for more reliable downloads."
+            )
+
+        if not settings.YOUTUBE_API_KEY:
+            logger.warning(
+                "⚠️  YOUTUBE_API_KEY is not set. Episode discovery will use the "
+                "YouTube channel RSS fallback, which may be slower."
+            )
+
+        # Log the active download strategy so it's visible in CI logs
+        if settings.RAPID_API_KEY:
+            logger.info(
+                "📡 Download strategy: RSS-first (when podcast.rss_feed is configured), "
+                "then RapidAPI, then yt-dlp."
+            )
+        else:
+            logger.info(
+                "📡 Download strategy: RSS-first (when podcast.rss_feed is configured), "
+                "then yt-dlp (RapidAPI not available)."
+            )
+
+        logger.info("✅ Secret validation complete.")
 
     def _send_discord_notification(self, title: str, url: str):
         if not settings.DISCORD_WEBHOOK_URL:
@@ -41,7 +91,8 @@ class AutomationPipeline:
 
     def run(self):
         logger.info("🚀 Starting Podcast Shorts Automation Pipeline")
-        
+        self._validate_secrets()
+
         try:
             # Try up to 5 different podcasts in case one fails
             for attempt in range(5):
@@ -51,7 +102,7 @@ class AutomationPipeline:
                     sys.exit(1)
 
                 logger.info(f"🔄 Attempt {attempt + 1}: Selected Podcast: {podcast.name}")
-                
+
                 episode_meta = downloader.fetch_latest_episode(podcast)
                 if not episode_meta:
                     logger.warning(f"⚠️ Could not fetch episode for {podcast.name}. Trying another channel...")
@@ -64,15 +115,15 @@ class AutomationPipeline:
                     logger.info(f"Episode {video_id} already processed. Skipping to next podcast.")
                     continue
 
-                # 2. Extract Highlight
-                audio_path = downloader.download_audio(video_id)
+                # 2. Download audio for transcription
+                audio_path = downloader.download_audio(video_id, podcast=podcast)
                 if not audio_path:
                     logger.error("❌ FAILED: Could not download audio for this episode. Trying another...")
                     continue
-                    
+
                 # If we got audio successfully, break out of retry loop and proceed
                 break
-                
+
             else:
                 # If the loop finished without breaking, ALL 5 attempts failed
                 logger.error("❌ FAILED: All 5 podcast attempts failed. Check logs.")
