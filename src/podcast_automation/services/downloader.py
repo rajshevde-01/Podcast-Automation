@@ -465,6 +465,7 @@ class DownloadService:
         opts.update({
             'format': 'bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4]/best',
             'outtmpl': output_path,
+            # yt-dlp section syntax: "*START-END" where values are seconds (float ok)
             'download_sections': f"*{start_time}-{end_time}",
             'force_keyframes_at_cuts': True,
         })
