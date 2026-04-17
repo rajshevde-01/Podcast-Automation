@@ -35,6 +35,14 @@ if not DB_PATH.exists():
     )
     st.stop()
 
+
+def _make_link(url) -> str:
+    """Format a YouTube URL as a Markdown hyperlink, or return '–'."""
+    if url and str(url).startswith("http"):
+        return f"[Watch]({url})"
+    return "–"
+
+
 # ── Load data ──────────────────────────────────────────────────────────────────
 @st.cache_data(ttl=60)
 def load_shorts() -> pd.DataFrame:
@@ -107,12 +115,7 @@ if not uploaded.empty:
     top.index += 1
 
     # Make video_url clickable
-    def make_link(url):
-        if url and str(url).startswith("http"):
-            return f"[Watch]({url})"
-        return "–"
-
-    top["video_url"] = top["video_url"].apply(make_link)
+    top["video_url"] = top["video_url"].apply(_make_link)
     st.dataframe(top, use_container_width=True)
 else:
     st.info("No uploaded shorts yet.")

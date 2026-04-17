@@ -149,7 +149,7 @@ class VideoService:
             if end_t <= start_t:
                 end_t = start_t + 0.3
 
-            # Build context window: up to 3 words before + current + up to 2 after
+            # Build context window: up to 3 words before + current + up to 3 after
             ctx_start = max(0, idx - 3)
             ctx_end = min(n, idx + 3)
             context_words = words[ctx_start:ctx_end]
@@ -166,10 +166,11 @@ class VideoService:
 
             # Scale-up/bounce: start at 90% scale, pop to 105% then settle to 100%
             duration = max(end_t - start_t, 0.1)
+            _dur = duration  # captured by value for closure safety
 
-            def make_scale(dur=duration):
+            def make_scale(_d=_dur):
                 def scale_fn(t):
-                    progress = t / dur
+                    progress = t / _d
                     if progress < 0.15:
                         return 0.90 + 0.15 * (progress / 0.15)
                     elif progress < 0.35:

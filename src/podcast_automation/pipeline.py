@@ -137,14 +137,14 @@ class AutomationPipeline:
             state = db_manager.get_pipeline_state(self.run_id)
             if state and state.get("stage") not in (None, "started"):
                 logger.info(f"♻️  Resuming pipeline from stage: {state['stage']}")
-                podcast_obj = None   # may not be needed for later stages
-                video_id     = state.get("episode_id")
-                title        = ""
-                audio_path   = state.get("audio_path")
-                segment_path = state.get("segment_path")
-                final_video_path = state.get("final_video_path")
-                thumbnail_path   = state.get("thumbnail_path")
-                highlight_json   = state.get("highlight_json")
+                podcast_obj   = None   # not persisted; only needed for channel_id
+                video_id      = state.get("episode_id", "")
+                title         = ""    # not critical after upload; used in description only
+                audio_path    = state.get("audio_path")
+                segment_path  = state.get("segment_path")
+                final_video_path  = state.get("final_video_path")
+                thumbnail_path    = state.get("thumbnail_path")
+                highlight_json    = state.get("highlight_json")
                 highlight = None
                 if highlight_json:
                     from .models import Highlight

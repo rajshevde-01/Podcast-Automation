@@ -1,8 +1,8 @@
 name: Fetch Analytics (24 h after upload)
 
 on:
-  # Run every day at 6:30 AM IST (01:00 UTC) — roughly 13+ hours after the
-  # daily pipeline which runs at 5 PM IST (11:30 UTC the previous day).
+  # Run every day at 6:30 AM IST (01:00 UTC) — approximately 13.5 hours after
+  # the daily pipeline which runs at 5:00 PM IST (11:30 UTC the previous day).
   schedule:
     - cron: "0 1 * * *"
   workflow_dispatch:
@@ -10,6 +10,8 @@ on:
 jobs:
   fetch-analytics:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout Code

@@ -44,6 +44,10 @@ def _fetch_stats(video_id: str) -> Optional[Dict]:
         logger.warning("YOUTUBE_API_KEY not set — cannot fetch analytics.")
         return None
 
+    if _requests is None:
+        logger.error("requests library not available — cannot fetch analytics.")
+        return None
+
     url = "https://www.googleapis.com/youtube/v3/videos"
     params = {
         "part": "statistics",
