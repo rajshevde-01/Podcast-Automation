@@ -1,7 +1,8 @@
 import os
 import sys
 import time
-import requests
+import uuid
+import json
 import subprocess
 from loguru import logger
 from .config import settings
@@ -12,10 +13,14 @@ from .services.llm_curator import curator
 from .services.video_engine import video_service
 from .services.thumbnail_engine import thumbnail_service
 from .services.youtube import youtube_service
+from .services.notifications import notification_service
 
 class AutomationPipeline:
-    def __init__(self, dry_run: bool = False):
+    def __init__(self, dry_run: bool = False, run_id: str = None):
         self.dry_run = dry_run
+        # Stable run_id lets a re-run resume where it left off
+        self.run_id = run_id or os.environ.get("GITHUB_RUN_ID") or str(uuid.uuid4())[:8]
+
         # Set up logging
         log_dir = settings.BASE_DIR / "logs"
         log_dir.mkdir(parents=True, exist_ok=True)
@@ -28,6 +33,10 @@ class AutomationPipeline:
             logger.info("✅ ffmpeg found and ready.")
         except (subprocess.CalledProcessError, FileNotFoundError):
             logger.warning("⚠️ ffmpeg not found in PATH. Video slicing and rendering may fail.")
+
+    # ------------------------------------------------------------------
+    # Secret validation
+    # ------------------------------------------------------------------
 
     def _validate_secrets(self):
         """
@@ -79,117 +88,238 @@ class AutomationPipeline:
 
         logger.info("✅ Secret validation complete.")
 
-    def _send_discord_notification(self, title: str, url: str):
-        if not settings.DISCORD_WEBHOOK_URL:
-            return
-        data = {"content": f"🚀 **New Podcast Short!**\n*{title}*\nWatch: {url}"}
-        try:
-            requests.post(settings.DISCORD_WEBHOOK_URL, json=data)
-            logger.info("Discord notification sent.")
-        except Exception as e:
-            logger.error(f"Discord Webhook Failed: {e}")
+    # ------------------------------------------------------------------
+    # Pipeline stages
+    # ------------------------------------------------------------------
+
+    def _pick_episode(self):
+        """Try up to 5 podcasts until we get a valid un-processed episode + audio."""
+        for attempt in range(5):
+            podcast = downloader.get_random_podcast()
+            if not podcast:
+                logger.error("❌ No podcasts found in list.")
+                sys.exit(1)
+
+            logger.info(f"🔄 Attempt {attempt + 1}: Selected Podcast: {podcast.name}")
+
+            episode_meta = downloader.fetch_latest_episode(podcast)
+            if not episode_meta:
+                logger.warning(f"⚠️ Could not fetch episode for {podcast.name}. Trying another…")
+                continue
+
+            video_id = episode_meta["id"]
+            title = episode_meta["title"]
+
+            if db_manager.is_episode_processed(video_id):
+                logger.info(f"Episode {video_id} already processed. Trying another podcast.")
+                continue
+
+            audio_path = downloader.download_audio(video_id, podcast=podcast)
+            if not audio_path:
+                logger.error("❌ Could not download audio. Trying another…")
+                continue
+
+            return podcast, episode_meta, video_id, title, audio_path
+
+        logger.error("❌ FAILED: All 5 podcast attempts failed. Check logs.")
+        sys.exit(1)
+
+    # ------------------------------------------------------------------
+    # Main run
+    # ------------------------------------------------------------------
 
     def run(self):
-        logger.info("🚀 Starting Podcast Shorts Automation Pipeline")
+        logger.info(f"🚀 Starting Podcast Shorts Automation Pipeline [run_id={self.run_id}]")
         self._validate_secrets()
 
         try:
-            # Try up to 5 different podcasts in case one fails
-            for attempt in range(5):
-                podcast = downloader.get_random_podcast()
-                if not podcast:
-                    logger.error("❌ No podcasts found in list.")
+            # ── Step 1: Check for resumable state ────────────────────────────
+            state = db_manager.get_pipeline_state(self.run_id)
+            if state and state.get("stage") not in (None, "started"):
+                logger.info(f"♻️  Resuming pipeline from stage: {state['stage']}")
+                podcast_obj = None   # may not be needed for later stages
+                video_id     = state.get("episode_id")
+                title        = ""
+                audio_path   = state.get("audio_path")
+                segment_path = state.get("segment_path")
+                final_video_path = state.get("final_video_path")
+                thumbnail_path   = state.get("thumbnail_path")
+                highlight_json   = state.get("highlight_json")
+                highlight = None
+                if highlight_json:
+                    from .models import Highlight
+                    try:
+                        highlight = Highlight(**json.loads(highlight_json))
+                    except Exception:
+                        pass
+                podcast_name = state.get("podcast_name", "Unknown Podcast")
+            else:
+                # ── Step 2: Pick episode + download audio ─────────────────────
+                db_manager.save_pipeline_state(self.run_id, "started")
+                podcast_obj, episode_meta, video_id, title, audio_path = self._pick_episode()
+                podcast_name = podcast_obj.name
+                db_manager.save_pipeline_state(
+                    self.run_id, "audio_downloaded",
+                    episode_id=video_id, podcast_name=podcast_name,
+                    audio_path=audio_path
+                )
+                segment_path = None
+                final_video_path = None
+                thumbnail_path = None
+                highlight = None
+
+            # ── Step 3: Transcribe + highlight extraction ─────────────────────
+            if highlight is None:
+                transcript = processor.transcribe(audio_path)
+
+                # Historical virality feedback loop
+                top_clips = db_manager.get_top_performing_clips(limit=5)
+
+                # Guest/topic detection (runs fast, uses only first 3 min)
+                meta = curator.detect_guest_and_topic(transcript)
+                guest_name = meta.get("guest_name")
+                topic = meta.get("topic")
+                if guest_name:
+                    logger.info(f"🎙️  Detected guest: {guest_name} | topic: {topic}")
+
+                highlights = curator.find_best_highlights(
+                    transcript,
+                    top_performing_clips=top_clips if top_clips else None,
+                    n=settings.MAX_HIGHLIGHTS_PER_RUN,
+                )
+
+                if not highlights:
+                    logger.error("❌ FAILED: Could not find any viral highlights.")
                     sys.exit(1)
 
-                logger.info(f"🔄 Attempt {attempt + 1}: Selected Podcast: {podcast.name}")
+                highlight = highlights[0]
+                logger.info(
+                    f"🏆 Best highlight: '{highlight.title}' "
+                    f"(score={highlight.viral_score:.1f}, "
+                    f"{highlight.start_time:.0f}s–{highlight.end_time:.0f}s)"
+                )
+                if len(highlights) > 1:
+                    for alt in highlights[1:]:
+                        logger.info(
+                            f"   Alt highlight: '{alt.title}' (score={alt.viral_score:.1f})"
+                        )
 
-                episode_meta = downloader.fetch_latest_episode(podcast)
-                if not episode_meta:
-                    logger.warning(f"⚠️ Could not fetch episode for {podcast.name}. Trying another channel...")
-                    continue
+                # Inherit guest metadata from detection if LLM didn't provide it
+                if not highlight.guest_name and guest_name:
+                    highlight.guest_name = guest_name
+                if not highlight.topic and topic:
+                    highlight.topic = topic
 
-                video_id = episode_meta['id']
-                title = episode_meta['title']
+                db_manager.save_pipeline_state(
+                    self.run_id, "highlights_found",
+                    highlight_json=highlight.model_dump_json()
+                )
 
-                if db_manager.is_episode_processed(video_id):
-                    logger.info(f"Episode {video_id} already processed. Skipping to next podcast.")
-                    continue
+            # ── Step 4: Download video segment ────────────────────────────────
+            if not segment_path or not os.path.exists(segment_path):
+                logger.info(f"Targeting highlight: {highlight.start_time}s - {highlight.end_time}s")
+                segment_path = downloader.download_video_segment(
+                    video_id, highlight.start_time, highlight.end_time
+                )
+                if not segment_path:
+                    logger.error("❌ FAILED: Could not download video segment.")
+                    sys.exit(1)
+                db_manager.save_pipeline_state(
+                    self.run_id, "video_downloaded", segment_path=segment_path
+                )
 
-                # 2. Download audio for transcription
-                audio_path = downloader.download_audio(video_id, podcast=podcast)
-                if not audio_path:
-                    logger.error("❌ FAILED: Could not download audio for this episode. Trying another...")
-                    continue
-
-                # If we got audio successfully, break out of retry loop and proceed
-                break
-
-            else:
-                # If the loop finished without breaking, ALL 5 attempts failed
-                logger.error("❌ FAILED: All 5 podcast attempts failed. Check logs.")
-                sys.exit(1)
-
-            transcript = processor.transcribe(audio_path)
-            highlight = curator.find_best_highlight(transcript)
-            
-            if not highlight:
-                logger.error("❌ FAILED: Could not find a viral highlight.")
-                sys.exit(1)
-
-            # 3. Process Video
-            logger.info(f"Targeting highlight: {highlight.start_time}s - {highlight.end_time}s")
-            segment_path = downloader.download_video_segment(video_id, highlight.start_time, highlight.end_time)
-            if not segment_path:
-                logger.error("❌ FAILED: Could not download video segment.")
-                sys.exit(1)
-
-            # Get word-level timestamps for kinetic text
+            # ── Step 5: Word-level transcription for karaoke subtitles ────────
             word_segments = processor.transcribe(segment_path, word_timestamps=True)
             words = []
             for seg in word_segments:
                 if "words" in seg:
                     words.extend(seg["words"])
 
-            final_video_path = video_service.create_video(
-                segment_path, 
-                highlight.title, 
-                words, 
-                b_roll_keyword=highlight.b_roll_keyword
-            )
+            # ── Step 6: Render video ───────────────────────────────────────────
+            if not final_video_path or not os.path.exists(final_video_path):
+                final_video_path = video_service.create_video(
+                    segment_path,
+                    highlight.title,
+                    words,
+                    b_roll_keyword=highlight.b_roll_keyword,
+                )
+                db_manager.save_pipeline_state(
+                    self.run_id, "video_rendered", final_video_path=final_video_path
+                )
 
-            # 4. Create Thumbnail
-            thumbnail_path = thumbnail_service.create_thumbnail(highlight.title, video_id)
+            # ── Step 7: Create thumbnail (with face frame + logo) ─────────────
+            if not thumbnail_path or not os.path.exists(thumbnail_path):
+                # Try to extract the best face frame from the rendered segment
+                face_frame = video_service.extract_best_face_frame(segment_path)
+                thumbnail_path = thumbnail_service.create_thumbnail(
+                    highlight.title,
+                    video_id,
+                    face_frame_bgr=face_frame,
+                    channel_id=getattr(podcast_obj, "channel_id", None) if podcast_obj else None,
+                )
+                db_manager.save_pipeline_state(
+                    self.run_id, "thumbnail_created", thumbnail_path=thumbnail_path
+                )
 
-            # 5. Upload to YouTube
+            # ── Step 8: Upload ─────────────────────────────────────────────────
             if self.dry_run:
                 logger.info("Dry run enabled. Skipping upload.")
                 logger.info(f"Final video saved at: {final_video_path}")
+                db_manager.delete_pipeline_state(self.run_id)
                 return
 
-            description = f"🔥 {highlight.title}\n\nCredit: {podcast.name} - {title}\n\nSubscribe for daily podcast bytes!\n"
-            description += " ".join([f"#{t.replace(' ', '').replace('#', '')}" for t in highlight.hashtags])
-            
-            tags = highlight.hashtags + [podcast.name, "shorts", "podcast"]
-            
+            # Build rich description including guest and topic
+            guest_credit = f" ft. {highlight.guest_name}" if highlight.guest_name else ""
+            topic_line = f"Topic: {highlight.topic}\n\n" if highlight.topic else ""
+            description = (
+                f"🔥 {highlight.title}\n\n"
+                f"{topic_line}"
+                f"Credit: {podcast_name}{guest_credit} — {title}\n\n"
+                "Subscribe for daily podcast bytes!\n"
+            )
+            description += " ".join(
+                f"#{t.replace(' ', '').replace('#', '')}" for t in highlight.hashtags
+            )
+
+            tags = highlight.hashtags + [podcast_name, "shorts", "podcast"]
+            if highlight.guest_name:
+                tags.append(highlight.guest_name)
+            if highlight.topic:
+                tags.append(highlight.topic)
+
             upload_url = youtube_service.upload_video(
                 final_video_path,
                 highlight.title + " #shorts",
                 description,
                 tags,
-                thumbnail_path
+                thumbnail_path,
             )
 
             if upload_url:
-                db_manager.log_episode(video_id, podcast.name, title)
-                short_id = db_manager.log_short(video_id, highlight.start_time, highlight.end_time, highlight.title)
+                db_manager.log_episode(video_id, podcast_name, title)
+                short_id = db_manager.log_short(
+                    video_id,
+                    highlight.start_time,
+                    highlight.end_time,
+                    highlight.title,
+                    viral_score=highlight.viral_score,
+                )
                 db_manager.mark_short_uploaded(short_id, upload_url)
-                self._send_discord_notification(highlight.title, upload_url)
+
+                # Broadcast to all configured notification channels
+                notification_service.broadcast(
+                    title=highlight.title,
+                    url=upload_url,
+                    thumbnail_path=thumbnail_path,
+                )
+
                 logger.info(f"✅ Pipeline Completed Successfully! {upload_url}")
+                db_manager.delete_pipeline_state(self.run_id)
             else:
                 logger.error("❌ FAILED: YouTube upload returned no URL. Check OAuth token!")
                 sys.exit(1)
-            
-            # 6. Cleanup
+
+            # ── Step 9: Cleanup ────────────────────────────────────────────────
             for f in [audio_path, segment_path, final_video_path, thumbnail_path]:
                 if f and os.path.exists(f):
                     try:
@@ -204,6 +334,7 @@ class AutomationPipeline:
         except Exception as e:
             logger.exception(f"PIPELINE CRITICAL ERROR: {e}")
             sys.exit(1)
+
 
 if __name__ == "__main__":
     pipeline = AutomationPipeline(dry_run=True)
