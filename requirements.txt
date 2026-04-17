@@ -24,3 +24,6 @@ pydantic==2.6.4
 pydantic-settings==2.2.1
 loguru==0.7.2
 isodate
+
+# Dashboard
+streamlit>=1.35.0

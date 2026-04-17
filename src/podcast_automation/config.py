@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     DISCORD_WEBHOOK_URL: Optional[str] = None
     RAPID_API_KEY: Optional[str] = None
 
+    # Notification channels (optional)
+    SLACK_WEBHOOK_URL: Optional[str] = None
+    TELEGRAM_BOT_TOKEN: Optional[str] = None
+    TELEGRAM_CHAT_ID: Optional[str] = None
+
     # Paths
     BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
     DATA_DIR: Path = BASE_DIR / "data"
@@ -28,6 +33,8 @@ class Settings(BaseSettings):
     TARGET_SHORT_DURATION: int = 60
     MIN_EPISODE_DURATION: int = 600 # 10 mins
     MAX_TRANSCRIPT_SECONDS: int = 1200 # 20 mins for analysis
+    MAX_HIGHLIGHTS_PER_RUN: int = 3   # How many top highlights to extract per episode
+    ANALYTICS_DELAY_HOURS: int = 24   # Hours after upload before fetching analytics
     
     # Video Settings
     VIDEO_WIDTH: int = 1080

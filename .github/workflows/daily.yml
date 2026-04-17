@@ -46,7 +46,35 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install -U yt-dlp # Always get the absolute latest for bypass
+          pip install -U yt-dlp # Always get the absolute latest
+
+      - name: Show Download Strategy
+        env:
+          RAPID_API_KEY: ${{ secrets.RAPID_API_KEY }}
+        run: |
+          python - <<'PY'
+          import os, json
+
+          rapid = bool(os.environ.get("RAPID_API_KEY", "").strip())
+          with open("podcasts_list.json") as f:
+              data = json.load(f)
+          all_pods = data.get("india_top_10", []) + data.get("world_top_20", [])
+          rss_count = sum(1 for p in all_pods if p.get("rss_feed"))
+
+          print(f"📡 RSS feeds configured : {rss_count}/{len(all_pods)} podcasts")
+          print(f"🔑 RapidAPI available   : {'yes' if rapid else 'no (YouTube fallback only)'}")
+
+          if rss_count > 0:
+              print("Strategy: RSS-first → RapidAPI fallback → yt-dlp last resort")
+          elif rapid:
+              print("Strategy: RapidAPI → yt-dlp last resort (no RSS feeds configured)")
+          else:
+              print(
+                  "WARNING: No RSS feeds and no RapidAPI key — "
+                  "yt-dlp only. May fail with bot-detection in CI. "
+                  "Add rss_feed to podcasts_list.json entries or set RAPID_API_KEY."
+              )
+          PY
 
       - name: Run Main Automation Script
         env:
@@ -57,12 +85,14 @@ jobs:
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
           RAPID_API_KEY: ${{ secrets.RAPID_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
         run: |
-          python -c 'import os; open("cookies.txt", "w", encoding="utf-8").write(os.environ.get("YOUTUBE_COOKIES", "") + "\n")'
           mkdir -p logs
-          python main.py
+          python main.py --run-id ${{ github.run_id }}
 
       - name: Upload Logs & Debug Info
         uses: actions/upload-artifact@v4
