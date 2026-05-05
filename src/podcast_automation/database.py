@@ -21,6 +21,8 @@ class DatabaseManager:
                     video_id TEXT PRIMARY KEY,
                     podcast_name TEXT,
                     title TEXT,
+                    license_type TEXT DEFAULT 'youtube',
+                    copyright_risk TEXT DEFAULT 'medium',
                     processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
@@ -38,8 +40,34 @@ class DatabaseManager:
                     FOREIGN KEY (episode_id) REFERENCES episodes(video_id)
                 )
             """)
+            # Table for caching channel info and copyright status
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS channels (
+                    channel_id TEXT PRIMARY KEY,
+                    name TEXT,
+                    subscriber_count INTEGER DEFAULT 0,
+                    total_videos INTEGER DEFAULT 0,
+                    country TEXT,
+                    copyright_risk TEXT DEFAULT 'medium',
+                    license_policy TEXT,
+                    last_checked TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            # Migrate existing tables: add new columns if they don't exist
+            self._add_column_if_missing(cursor, "episodes", "license_type", "TEXT DEFAULT 'youtube'")
+            self._add_column_if_missing(cursor, "episodes", "copyright_risk", "TEXT DEFAULT 'medium'")
+            
             conn.commit()
-            logger.info("Database initialized.")
+            logger.info("Database initialized (v6 schema).")
+
+    def _add_column_if_missing(self, cursor, table: str, column: str, col_type: str):
+        """Safely adds a column to an existing table if it doesn't exist."""
+        try:
+            cursor.execute(f"SELECT {column} FROM {table} LIMIT 1")
+        except sqlite3.OperationalError:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}")
+            logger.info(f"Added column '{column}' to '{table}'")
 
     def is_episode_processed(self, video_id: str) -> bool:
         with self._get_connection() as conn:
@@ -47,12 +75,13 @@ class DatabaseManager:
             cursor.execute("SELECT 1 FROM episodes WHERE video_id = ?", (video_id,))
             return cursor.fetchone() is not None
 
-    def log_episode(self, video_id: str, podcast_name: str, title: str):
+    def log_episode(self, video_id: str, podcast_name: str, title: str,
+                    license_type: str = "youtube", copyright_risk: str = "medium"):
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT OR IGNORE INTO episodes (video_id, podcast_name, title) VALUES (?, ?, ?)",
-                (video_id, podcast_name, title)
+                "INSERT OR IGNORE INTO episodes (video_id, podcast_name, title, license_type, copyright_risk) VALUES (?, ?, ?, ?, ?)",
+                (video_id, podcast_name, title, license_type, copyright_risk)
             )
             conn.commit()
 
@@ -80,6 +109,26 @@ class DatabaseManager:
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM shorts WHERE is_uploaded = 1 ORDER BY created_at DESC LIMIT 1")
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+    def save_channel_info(self, channel_id: str, name: str, subscriber_count: int = 0,
+                          total_videos: int = 0, country: str = None,
+                          copyright_risk: str = "medium", license_policy: str = None):
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO channels 
+                (channel_id, name, subscriber_count, total_videos, country, copyright_risk, license_policy, last_checked)
+                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            """, (channel_id, name, subscriber_count, total_videos, country, copyright_risk, license_policy))
+            conn.commit()
+
+    def get_channel_info(self, channel_id: str) -> Optional[dict]:
+        with self._get_connection() as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM channels WHERE channel_id = ?", (channel_id,))
             row = cursor.fetchone()
             return dict(row) if row else None
 

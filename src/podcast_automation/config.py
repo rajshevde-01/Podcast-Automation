@@ -34,6 +34,15 @@ class Settings(BaseSettings):
     VIDEO_HEIGHT: int = 1920
     FPS: int = 30
     
+    # Video Quality — ordered preference (tries each until one works)
+    VIDEO_QUALITY_PREFERENCE: List[str] = ["2160", "1440", "1080", "720", "480"]
+    AUDIO_NORMALIZE: bool = True  # Apply loudnorm filter via ffmpeg
+    
+    # Copyright Safety
+    # Channels rated above this threshold are auto-skipped
+    # "low" = skip nothing, "medium" = skip high-risk, "high" = skip medium+high
+    COPYRIGHT_RISK_THRESHOLD: str = "medium"
+    
     # Whisper Settings
     WHISPER_MODEL: str = "base"
     WHISPER_DEVICE: str = "cpu"
@@ -54,5 +63,12 @@ class Settings(BaseSettings):
         self.DATA_DIR.mkdir(parents=True, exist_ok=True)
         self.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         self.ASSETS_DIR.mkdir(parents=True, exist_ok=True)
+
+    def should_skip_risk(self, risk_level: str) -> bool:
+        """Returns True if the given risk level should be skipped based on threshold."""
+        risk_order = {"low": 0, "medium": 1, "high": 2}
+        threshold_val = risk_order.get(self.COPYRIGHT_RISK_THRESHOLD, 1)
+        risk_val = risk_order.get(risk_level, 2)
+        return risk_val > threshold_val
 
 settings = Settings()

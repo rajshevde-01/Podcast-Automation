@@ -19,7 +19,7 @@ class CuratorService:
             self._client = Groq(api_key=self.api_key)
         return self._client
 
-    def find_best_highlight(self, transcript_segments: List[Dict]) -> Optional[Highlight]:
+    def find_best_highlight(self, transcript_segments: List[Dict], video_type: str = "short") -> Optional[Highlight]:
         # Limit transcript for analysis
         text_buffer = ""
         for seg in transcript_segments:
@@ -27,22 +27,54 @@ class CuratorService:
                 break
             text_buffer += f"[{seg['start']:.1f}s - {seg['end']:.1f}s] {seg['text']}\n"
             
-        prompt = f"""
-You are an expert viral content curator for YouTube Shorts and TikTok.
-Analyze the following transcript and find the single MOST viral, engaging, or controversial segment between 45s and 60s.
-The segment must have a strong hook within the first 3 seconds.
+        if video_type == "long":
+            prompt = f"""
+You are an elite podcast producer and YouTube content curator.
+Your task is to analyze the following podcast transcript and extract the absolute BEST, highly engaging long-form highlight.
+
+CRITICAL CLIP REQUIREMENTS:
+1. Length: The clip MUST be between 300 and 600 seconds long (5 to 10 minutes).
+2. The Hook (0-15s): The clip MUST start at an interesting topic change, a profound question, or a high-energy moment.
+3. The Body: The clip must contain a deep dive into a single compelling topic, story, or debate.
+4. The Payoff: The clip MUST end on a natural conclusion or a complete thought. Do NOT cut off mid-sentence.
+5. Context: The clip must make sense entirely on its own without needing the rest of the podcast.
 
 Transcript:
 {text_buffer}
 
-Return ONLY a valid JSON object with the following keys:
+Return ONLY a valid JSON object with the following keys. Do NOT wrap it in markdown block quotes.
 {{
-  "start_time": float,
-  "end_time": float,
-  "title": "Short catchy title",
-  "reason": "Why this will go viral",
-  "hashtags": ["list", "of", "5", "tags"],
-  "b_roll_keyword": "single noun topic for visual aid"
+  "start_time": float, // Exact start timestamp from transcript (e.g. 112.4)
+  "end_time": float,   // Exact end timestamp from transcript (e.g. 455.1)
+  "title": "A highly clickable YouTube video title (max 60 chars)",
+  "reason": "Brief explanation of why this segment is engaging for a 5-10 minute video",
+  "hashtags": ["list", "of", "4", "tags"],
+  "b_roll_keyword": "A single, highly specific noun for a background thumbnail/b-roll (e.g., 'money', 'space')"
+}}
+"""
+        else:
+            prompt = f"""
+You are an elite TikTok and YouTube Shorts viral content curator.
+Your task is to analyze the following podcast transcript and extract the absolute BEST, most engaging clip.
+
+CRITICAL CLIP REQUIREMENTS:
+1. Length: The clip MUST be between 25 and 55 seconds long.
+2. The Hook (0-3s): The clip MUST start with an attention-grabbing statement, controversial opinion, or high-energy moment. Do NOT start with boring filler (e.g., "Yeah so...", "I mean...").
+3. The Body: The clip must tell a compelling micro-story, drop a valuable insight, or be extremely funny/entertaining.
+4. The Payoff: The clip MUST end on a strong note (a punchline, a profound realization, or a complete thought). Do NOT cut off mid-sentence.
+5. Context: The clip must make sense entirely on its own without needing the rest of the podcast.
+
+Transcript:
+{text_buffer}
+
+Return ONLY a valid JSON object with the following keys. Do NOT wrap it in markdown block quotes.
+{{
+  "start_time": float, // Exact start timestamp from transcript (e.g. 112.4)
+  "end_time": float,   // Exact end timestamp from transcript (e.g. 155.1)
+  "title": "A highly clickable, high-retention YouTube Short title (max 50 chars)",
+  "reason": "Brief explanation of why this hook and payoff will retain viewers",
+  "hashtags": ["list", "of", "4", "tags"],
+  "b_roll_keyword": "A single, highly specific noun for a background b-roll image (e.g., 'money', 'robot', 'brain')"
 }}
 """
         logger.info("Calling Groq LLM for highlight selection...")

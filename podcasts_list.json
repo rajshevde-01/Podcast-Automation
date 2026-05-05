@@ -4,61 +4,81 @@
       "name": "The Ranveer Show",
       "channel_id": "UCPxMZIFE856tbTfdkdjzTSQ",
       "url": "https://www.youtube.com/@RanveerAllahbadia",
-      "theme": "self-improvement, spirituality, business"
+      "theme": "self-improvement, spirituality, business",
+      "copyright_risk": "low",
+      "license_policy": "Fan clips widely tolerated; large clip ecosystem exists"
     },
     {
       "name": "WTF is with Nikhil Kamath",
       "channel_id": "UCRv4waLxgUN0Z-yb2I1Fq4A",
       "url": "https://www.youtube.com/@NikhilKamath",
-      "theme": "business, entrepreneurship, finance"
+      "theme": "business, entrepreneurship, finance",
+      "copyright_risk": "low",
+      "license_policy": "No known enforcement; clip channels exist"
     },
     {
       "name": "Figuring Out with Raj Shamani",
       "channel_id": "UCshPyRiu9XTQb2gEagNt-3A",
       "url": "https://www.youtube.com/@rajshamani",
-      "theme": "finance, startups, motivation"
+      "theme": "finance, startups, motivation",
+      "copyright_risk": "low",
+      "license_policy": "Encourages sharing; no enforcement history"
     },
     {
       "name": "Dostcast",
       "channel_id": "UCp90ksJ_S4z1AYv2p0gMnPg",
       "url": "https://www.youtube.com/@Dostcast",
-      "theme": "culture, conversations, india"
+      "theme": "culture, conversations, india",
+      "copyright_risk": "low",
+      "license_policy": "Small channel; no enforcement"
     },
     {
       "name": "Aman Dhattarwal Podcasts",
       "channel_id": "UC860H_U6n_L5n7_4f1sQ9Cw",
       "url": "https://www.youtube.com/@AmanDhattarwal",
-      "theme": "education, career, students"
+      "theme": "education, career, students",
+      "copyright_risk": "low",
+      "license_policy": "Educational content; encourages reuse"
     },
     {
       "name": "Prakhar Ke Pravachan",
       "channel_id": "UCHOKvQW2N4kLVhKYn2bvF7A",
       "url": "https://www.youtube.com/@PrakharkePravachan",
-      "theme": "philosophy, psychology, culture"
+      "theme": "philosophy, psychology, culture",
+      "copyright_risk": "low",
+      "license_policy": "Fan clips tolerated"
     },
     {
       "name": "The Indian Dream",
       "channel_id": "UC6_a1EFyDRPlHX75091EcAQ",
       "url": "https://www.youtube.com/@TheIndianDream",
-      "theme": "business, smb, entrepreneurship"
+      "theme": "business, smb, entrepreneurship",
+      "copyright_risk": "low",
+      "license_policy": "Small channel; no enforcement"
     },
     {
       "name": "Unfiltered by Samay Raina",
       "channel_id": "UCAov2BBv1ZJav0c_yHEciAw",
       "url": "https://www.youtube.com/@SamayRainaOfficial",
-      "theme": "comedy, chess, unfiltered"
+      "theme": "comedy, chess, unfiltered",
+      "copyright_risk": "low",
+      "license_policy": "Fan clips widespread; no enforcement"
     },
     {
       "name": "Abhi and Niyu",
       "channel_id": "UC9pkSCLLK-884fFtPbQ59XQ",
       "url": "https://www.youtube.com/@AbhiandNiyu",
-      "theme": "india, history, facts"
+      "theme": "india, history, facts",
+      "copyright_risk": "low",
+      "license_policy": "Educational; clips tolerated"
     },
     {
       "name": "Shlok Srivastava (Tech Burner Podcasts)",
       "channel_id": "UCqeXMnAG9VCSQcxLR-F2mKw",
       "url": "https://www.youtube.com/@TechBurner",
-      "theme": "technology, business, future"
+      "theme": "technology, business, future",
+      "copyright_risk": "low",
+      "license_policy": "Fan clips tolerated"
     }
   ],
   "world_top_20": [
@@ -66,121 +86,161 @@
       "name": "The Joe Rogan Experience",
       "channel_id": "UCzQUP1qoWDoEbmsQxvdjxgQ",
       "url": "https://www.youtube.com/@joerogan",
-      "theme": "comedy, science, MMA, culture"
+      "theme": "comedy, science, MMA, culture",
+      "copyright_risk": "high",
+      "license_policy": "Spotify exclusive; aggressive Content ID enforcement"
     },
     {
       "name": "Huberman Lab",
       "channel_id": "UC2D2CMWXMOVWx7giW1n3LIg",
       "url": "https://www.youtube.com/@hubermanlab",
-      "theme": "science, health, neuroscience"
+      "theme": "science, health, neuroscience",
+      "copyright_risk": "medium",
+      "license_policy": "Max 60s non-commercial only; no endorsement implied"
     },
     {
       "name": "Lex Fridman Podcast",
       "channel_id": "UCJIfeSCssxSC_Dhc5s7woww",
       "url": "https://www.youtube.com/@lexfridman",
-      "theme": "AI, technology, physics, philosophy"
+      "theme": "AI, technology, physics, philosophy",
+      "copyright_risk": "medium",
+      "license_policy": "Standard copyright; fan clips exist but risky"
     },
     {
       "name": "Diary of a CEO",
       "channel_id": "UCnjgxChqYYnyoqO4k_Q1d6Q",
       "url": "https://www.youtube.com/@TheDiaryOfACEO",
-      "theme": "business, psychology, health"
+      "theme": "business, psychology, health",
+      "copyright_risk": "medium",
+      "license_policy": "Has own clips channel; may enforce on duplicates"
     },
     {
       "name": "My First Million",
       "channel_id": "UCxoRKax_0vHaulMbceZtAwA",
       "url": "https://www.youtube.com/@MyFirstMillionPod",
-      "theme": "business, startups, trends"
+      "theme": "business, startups, trends",
+      "copyright_risk": "low",
+      "license_policy": "Encourages clips and sharing; very creator-friendly"
     },
     {
       "name": "All-In Podcast",
       "channel_id": "UCESLZhusAkFfsNsApnjF_Cg",
       "url": "https://www.youtube.com/@allin",
-      "theme": "tech, business, politics, economy"
+      "theme": "tech, business, politics, economy",
+      "copyright_risk": "low",
+      "license_policy": "Fan clips tolerated; large clip ecosystem"
     },
     {
       "name": "Impaulsive",
       "channel_id": "UCE9ZKI1b_PhVm3gejYuilhw",
       "url": "https://www.youtube.com/@impaulsive",
-      "theme": "entertainment, influencers, sports"
+      "theme": "entertainment, influencers, sports",
+      "copyright_risk": "medium",
+      "license_policy": "Standard copyright; has own clips channel"
     },
     {
       "name": "Flagrant",
       "channel_id": "UC64S-R52h5z4k7u9_5v7CPA",
       "url": "https://www.youtube.com/@OfficialFlagrant",
-      "theme": "comedy, pop culture"
+      "theme": "comedy, pop culture",
+      "copyright_risk": "low",
+      "license_policy": "Encourages fan clips; clip-friendly"
     },
     {
       "name": "Theo Von",
       "channel_id": "UC5AQEUAwCh1sGDvkQtkDWUQ",
       "url": "https://www.youtube.com/@TheoVon",
-      "theme": "comedy, interviews"
+      "theme": "comedy, interviews",
+      "copyright_risk": "low",
+      "license_policy": "Fan clips widespread; no enforcement"
     },
     {
       "name": "Valuetainment",
       "channel_id": "UCGX7nGXpz-CmO_Arg-cgJ7A",
       "url": "https://www.youtube.com/@Valuetainment",
-      "theme": "business, politics, leadership"
+      "theme": "business, politics, leadership",
+      "copyright_risk": "low",
+      "license_policy": "Encourages sharing and discussion"
     },
     {
       "name": "Chris Williamson (Modern Wisdom)",
       "channel_id": "UCIaH-gZIVC432YRjNVvnyCA",
       "url": "https://www.youtube.com/@ChrisWillx",
-      "theme": "psychology, culture, self-improvement"
+      "theme": "psychology, culture, self-improvement",
+      "copyright_risk": "low",
+      "license_policy": "Fan clips tolerated; large clip ecosystem"
     },
     {
       "name": "Tom Bilyeu (Impact Theory)",
       "channel_id": "UCnYMOamNKLGVlJgRUbamveA",
       "url": "https://www.youtube.com/@TomBilyeu",
-      "theme": "mindset, business, health"
+      "theme": "mindset, business, health",
+      "copyright_risk": "low",
+      "license_policy": "Encourages sharing; clip-friendly"
     },
     {
       "name": "PBD Podcast",
       "channel_id": "UCIHdDJ0tjn_3j-FS7s_X1kQ",
       "url": "https://www.youtube.com/@PBDPodcast",
-      "theme": "business, politics, debates"
+      "theme": "business, politics, debates",
+      "copyright_risk": "low",
+      "license_policy": "Fan clips widespread; Valuetainment network is clip-friendly"
     },
     {
       "name": "Jordan B Peterson",
       "channel_id": "UC_4hsKk8MW-r7JwAz5h7DrA",
       "url": "https://www.youtube.com/@JordanBPeterson",
-      "theme": "psychology, philosophy, culture"
+      "theme": "psychology, philosophy, culture",
+      "copyright_risk": "medium",
+      "license_policy": "Has own clips channels; may enforce on monetized reposts"
     },
     {
       "name": "Acquired",
       "channel_id": "UCyFqFYfTW2VoIQKylJ04Rtw",
       "url": "https://www.youtube.com/@AcquiredFM",
-      "theme": "tech history, company building"
+      "theme": "tech history, company building",
+      "copyright_risk": "low",
+      "license_policy": "Community-friendly; clips tolerated"
     },
     {
       "name": "The Iced Coffee Hour",
       "channel_id": "UCg0cxj8IR-2raYSGy_cq9bw",
       "url": "https://www.youtube.com/@IcedCoffeeHour",
-      "theme": "finance, real estate, youtube"
+      "theme": "finance, real estate, youtube",
+      "copyright_risk": "low",
+      "license_policy": "Creator-friendly; no enforcement"
     },
     {
       "name": "Colin and Samir",
       "channel_id": "UCwayCyXbToTPxYJUBcEx74g",
       "url": "https://www.youtube.com/@ColinandSamir",
-      "theme": "creator economy, youtube business"
+      "theme": "creator economy, youtube business",
+      "copyright_risk": "low",
+      "license_policy": "Meta-creators; very clip-friendly"
     },
     {
       "name": "BFFs",
       "channel_id": "UCMhyesTXP5MZO7l2cxv9xKw",
       "url": "https://www.youtube.com/@BFFspod",
-      "theme": "pop culture, drama, tiktok"
+      "theme": "pop culture, drama, tiktok",
+      "copyright_risk": "medium",
+      "license_policy": "Standard copyright; limited clip tolerance"
     },
     {
       "name": "Full Send Podcast",
       "channel_id": "UCRVEzpUvlbs06pNZ1WSzg2A",
       "url": "https://www.youtube.com/@FULLSENDPODCAST",
-      "theme": "lifestyle, influencers, celebrities"
+      "theme": "lifestyle, influencers, celebrities",
+      "copyright_risk": "medium",
+      "license_policy": "Standard copyright; has own clip management"
     },
     {
       "name": "Shawn Ryan Show",
       "channel_id": "UCkoujZQZatbqy4KGcgjpVxQ",
       "url": "https://www.youtube.com/@ShawnRyanShowOfficial",
-      "theme": "military, intelligence, current events"
+      "theme": "military, intelligence, current events",
+      "copyright_risk": "low",
+      "license_policy": "Fan clips widespread; clip-friendly community"
     }
   ]
 }
