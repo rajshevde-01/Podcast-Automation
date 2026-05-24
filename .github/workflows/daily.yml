@@ -26,13 +26,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -U yt-dlp
-        shell: pwsh
 
       - name: Show Download Strategy
         env:
           RAPID_API_KEY: ${{ secrets.RAPID_API_KEY }}
         run: |
-          python -c @"
+          python -c "
           import os, json
           rapid = bool(os.environ.get('RAPID_API_KEY', '').strip())
           with open('podcasts_list.json') as f:
@@ -47,8 +46,7 @@ jobs:
               print('Strategy: RapidAPI -> yt-dlp last resort (no RSS feeds configured)')
           else:
               print('WARNING: No RSS feeds and no RapidAPI key -- yt-dlp only.')
-          "@
-        shell: pwsh
+          "
 
       - name: Run Main Automation Script
         env:
@@ -65,9 +63,8 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GITHUB_RUN_ID: ${{ github.run_id }}
         run: |
-          New-Item -ItemType Directory -Force -Path logs | Out-Null
+          mkdir -p logs
           python main.py --run-id ${{ github.run_id }}
-        shell: pwsh
 
       - name: Upload Logs & Debug Info
         uses: actions/upload-artifact@v4
