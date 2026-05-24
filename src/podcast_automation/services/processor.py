@@ -25,8 +25,13 @@ class TranscriptionService:
         return self._model
 
     def transcribe(self, audio_path: str, word_timestamps: bool = False) -> List[Dict]:
-        logger.info(f"Transcribing: {audio_path}")
-        segments, info = self.model.transcribe(audio_path, beam_size=5, word_timestamps=word_timestamps)
+        logger.info(f"Transcribing: {audio_path} (max {settings.MAX_TRANSCRIPT_SECONDS}s)")
+        segments, info = self.model.transcribe(
+            audio_path,
+            beam_size=5,
+            word_timestamps=word_timestamps,
+            clip_timestamps=f"0,{settings.MAX_TRANSCRIPT_SECONDS}"
+        )
         
         logger.info(f"Detected language: {info.language} ({info.language_probability:.2f})")
         
