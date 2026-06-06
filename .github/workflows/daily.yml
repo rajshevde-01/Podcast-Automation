@@ -2,14 +2,14 @@ name: Daily Podcast Shorts Automation
 
 on:
   schedule:
-    # 5:00 PM IST (11:30 UTC)
-    - cron: "30 11 * * *"
+    # 9:00 AM IST (03:30 UTC)
+    - cron: "30 3 * * *"
   workflow_dispatch: # Allows manual trigger from GitHub Actions tab
 
 jobs:
   run-pipeline:
-    # Self-hosted runner uses your residential IP — no YouTube bot-detection
-    runs-on: self-hosted
+    # Ubuntu runners are free for public repos and almost never queue
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
@@ -23,48 +23,30 @@ jobs:
 
       - name: Ensure ffmpeg is available
         run: |
-          $ffmpegCheck = Get-Command ffmpeg -ErrorAction SilentlyContinue
-          if ($ffmpegCheck) {
-            Write-Host "ffmpeg already installed: $($ffmpegCheck.Source)"
-          } else {
-            $existingBin = Get-ChildItem "C:\ffmpeg\ffmpeg-*-essentials_build\bin" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
-            if ($existingBin) {
-              Write-Host "ffmpeg found at $($existingBin.FullName)"
-              echo "$($existingBin.FullName)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-            } else {
-              Write-Host "ffmpeg not found, downloading..."
-              $zipUrl = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
-              $zipPath = "$env:TEMP\ffmpeg.zip"
-              Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath -UseBasicParsing
-              Expand-Archive -Path $zipPath -DestinationPath "C:\ffmpeg" -Force
-              $binDir = Get-ChildItem "C:\ffmpeg\ffmpeg-*-essentials_build\bin" -Directory | Select-Object -First 1
-              Write-Host "ffmpeg installed to $($binDir.FullName)"
-              echo "$($binDir.FullName)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-            }
-          }
+          if command -v ffmpeg &> /dev/null; then
+            echo "ffmpeg already installed: $(which ffmpeg)"
+          else
+            echo "Installing ffmpeg..."
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -1
 
       - name: Ensure ImageMagick is available
         run: |
-          $magickCheck = Get-Command magick -ErrorAction SilentlyContinue
-          if ($magickCheck) {
-            Write-Host "ImageMagick already installed: $($magickCheck.Source)"
-          } else {
-            $existingDir = "C:\ImageMagick"
-            $magickExe = Get-ChildItem "$existingDir\magick.exe" -ErrorAction SilentlyContinue
-            if ($magickExe) {
-              Write-Host "ImageMagick found at $existingDir"
-            } else {
-              Write-Host "ImageMagick not found, downloading portable..."
-              $zipUrl = "https://imagemagick.org/archive/binaries/ImageMagick-7.1.1-47-portable-Q16-HDRI-x64.zip"
-              $zipPath = "$env:TEMP\imagemagick.zip"
-              Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath -UseBasicParsing
-              New-Item -ItemType Directory -Force -Path $existingDir | Out-Null
-              Expand-Archive -Path $zipPath -DestinationPath $existingDir -Force
-              Write-Host "ImageMagick installed to $existingDir"
-            }
-            echo "$existingDir" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-            echo "IMAGEMAGICK_BINARY=$existingDir\magick.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          }
+          if command -v magick &> /dev/null || command -v convert &> /dev/null; then
+            echo "ImageMagick already installed"
+          else
+            echo "Installing ImageMagick..."
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq imagemagick
+          fi
+          # Fix ImageMagick policy to allow text rendering for moviepy
+          sudo sed -i 's/none/read,write/g' /etc/ImageMagick-6/policy.xml || true
+          # Set IMAGEMAGICK_BINARY for moviepy/wand compatibility
+          MAGICK_BIN=$(which magick 2>/dev/null || which convert 2>/dev/null)
+          echo "ImageMagick binary: $MAGICK_BIN"
+          echo "IMAGEMAGICK_BINARY=$MAGICK_BIN" >> "$GITHUB_ENV"
 
       - name: Install Python Dependencies
         run: |
