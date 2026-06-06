@@ -13,12 +13,14 @@ dist/
 
 # Databases
 *.db
+!podcast_automation.db
 *.sqlite
 
 # Application Specific
 logs/
 data/
-output/
+output/*
+!output/scheduled_queue/
 assets/satisfying.mp4
 
 # OS
