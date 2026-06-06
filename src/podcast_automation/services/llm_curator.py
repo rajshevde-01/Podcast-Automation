@@ -114,10 +114,36 @@ Return ONLY a valid JSON object:
 
         Returns a list sorted by viral_score descending.
         """
-        text_buffer = ""
+        # Merge consecutive segments into 15-second blocks to fit under TPM/TPD rate limits
+        merged_segments = []
+        current_chunk = []
+        chunk_start = None
+        
         for seg in transcript_segments:
             if seg["start"] > settings.MAX_TRANSCRIPT_SECONDS:
                 break
+            if chunk_start is None:
+                chunk_start = seg["start"]
+            current_chunk.append(seg["text"])
+            
+            if seg["end"] - chunk_start >= 15.0:
+                merged_segments.append({
+                    "start": chunk_start,
+                    "end": seg["end"],
+                    "text": " ".join(current_chunk)
+                })
+                current_chunk = []
+                chunk_start = None
+                
+        if current_chunk and chunk_start is not None:
+            merged_segments.append({
+                "start": chunk_start,
+                "end": min(settings.MAX_TRANSCRIPT_SECONDS, transcript_segments[-1]["end"]),
+                "text": " ".join(current_chunk)
+            })
+
+        text_buffer = ""
+        for seg in merged_segments:
             text_buffer += f"[{seg['start']:.1f}s - {seg['end']:.1f}s] {seg['text']}\n"
 
         # Build optional performance context block
