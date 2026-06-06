@@ -114,7 +114,16 @@ Return ONLY a valid JSON object:
 
         Returns a list sorted by viral_score descending.
         """
-        # Merge consecutive segments into 15-second blocks to fit under TPM/TPD rate limits
+        # Merge consecutive segments into blocks to fit under TPM/TPD rate limits
+        duration = 0.0
+        for seg in transcript_segments:
+            if seg["start"] > settings.MAX_TRANSCRIPT_SECONDS:
+                break
+            duration = max(duration, seg["end"])
+            
+        # Determine target block size (ensure at most 35 blocks to be safe under 6k TPM limit)
+        block_size = max(15.0, duration / 35.0)
+
         merged_segments = []
         current_chunk = []
         chunk_start = None
@@ -126,7 +135,7 @@ Return ONLY a valid JSON object:
                 chunk_start = seg["start"]
             current_chunk.append(seg["text"])
             
-            if seg["end"] - chunk_start >= 15.0:
+            if seg["end"] - chunk_start >= block_size:
                 merged_segments.append({
                     "start": chunk_start,
                     "end": seg["end"],
@@ -138,7 +147,7 @@ Return ONLY a valid JSON object:
         if current_chunk and chunk_start is not None:
             merged_segments.append({
                 "start": chunk_start,
-                "end": min(settings.MAX_TRANSCRIPT_SECONDS, transcript_segments[-1]["end"]),
+                "end": min(settings.MAX_TRANSCRIPT_SECONDS, transcript_segments[-1]["end"] if transcript_segments else settings.MAX_TRANSCRIPT_SECONDS),
                 "text": " ".join(current_chunk)
             })
 
