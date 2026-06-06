@@ -94,7 +94,9 @@ class YouTubeService:
                 "title": snippet.get("title"),
                 "description": snippet.get("description"),
                 "duration": duration_seconds,
-                "thumbnail": snippet.get("thumbnails", {}).get("high", {}).get("url")
+                "thumbnail": snippet.get("thumbnails", {}).get("high", {}).get("url"),
+                "channel_id": snippet.get("channelId"),
+                "channel_title": snippet.get("channelTitle")
             }
         except Exception as e:
             logger.error(f"API Key metadata fetch failed: {e}")
@@ -125,7 +127,9 @@ class YouTubeService:
                 "title": snippet.get("title"),
                 "description": snippet.get("description"),
                 "duration": duration_seconds,
-                "thumbnail": snippet.get("thumbnails", {}).get("high", {}).get("url")
+                "thumbnail": snippet.get("thumbnails", {}).get("high", {}).get("url"),
+                "channel_id": snippet.get("channelId"),
+                "channel_title": snippet.get("channelTitle")
             }
         except Exception as e:
             logger.error(f"OAuth metadata fetch failed: {e}")
@@ -159,7 +163,8 @@ class YouTubeService:
                       title: str,
                       description: str,
                       tags: List[str],
-                      thumbnail_path: Optional[str] = None) -> Optional[str]:
+                      thumbnail_path: Optional[str] = None,
+                      category_id: str = "22") -> Optional[str]:
         
         logger.info(f"Uploading Video: {title}")
         
@@ -168,7 +173,7 @@ class YouTubeService:
                 "title": title,
                 "description": description,
                 "tags": tags,
-                "categoryId": "22",  # People & Blogs
+                "categoryId": category_id,
             },
             "status": {
                 "privacyStatus": "public",
