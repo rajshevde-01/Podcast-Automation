@@ -14,6 +14,7 @@ from .services.video_engine import video_service
 from .services.thumbnail_engine import thumbnail_service
 from .services.youtube import youtube_service
 from .services.notifications import notification_service
+from .services.metadata_builder import metadata_builder
 
 class AutomationPipeline:
     def __init__(self, dry_run: bool = False, run_id: str = None):
@@ -93,8 +94,8 @@ class AutomationPipeline:
     # ------------------------------------------------------------------
 
     def _pick_episode(self):
-        """Try up to 5 podcasts until we get a valid un-processed episode + audio."""
-        for attempt in range(5):
+        """Try up to 10 podcasts until we get a valid un-processed episode + audio."""
+        for attempt in range(10):
             podcast = downloader.get_random_podcast()
             if not podcast:
                 logger.error("❌ No podcasts found in list.")
@@ -114,14 +115,18 @@ class AutomationPipeline:
                 logger.info(f"Episode {video_id} already processed. Trying another podcast.")
                 continue
 
-            audio_path = downloader.download_audio(video_id, podcast=podcast)
+            try:
+                audio_path = downloader.download_audio(video_id, podcast=podcast)
+            except RuntimeError as e:
+                logger.warning(f"⚠️ Bot-detection hit for {podcast.name}: {e}. Trying another…")
+                continue
             if not audio_path:
                 logger.error("❌ Could not download audio. Trying another…")
                 continue
 
             return podcast, episode_meta, video_id, title, audio_path
 
-        logger.error("❌ FAILED: All 5 podcast attempts failed. Check logs.")
+        logger.error("❌ FAILED: All 10 podcast attempts failed. Check logs.")
         sys.exit(1)
 
     # ------------------------------------------------------------------
@@ -268,31 +273,36 @@ class AutomationPipeline:
                 db_manager.delete_pipeline_state(self.run_id)
                 return
 
-            # Build rich description including guest and topic
-            guest_credit = f" ft. {highlight.guest_name}" if highlight.guest_name else ""
-            topic_line = f"Topic: {highlight.topic}\n\n" if highlight.topic else ""
-            description = (
-                f"🔥 {highlight.title}\n\n"
-                f"{topic_line}"
-                f"Credit: {podcast_name}{guest_credit} — {title}\n\n"
-                "Subscribe for daily podcast bytes!\n"
-            )
-            description += " ".join(
-                f"#{t.replace(' ', '').replace('#', '')}" for t in highlight.hashtags
+            # Build premium metadata including guest, topic, description and smart tags
+            podcast_theme = getattr(podcast_obj, "theme", None) if podcast_obj else None
+            category_id = metadata_builder.get_category_id(podcast_theme)
+            
+            hook_title = metadata_builder.curate_title(highlight.title)
+            
+            description = metadata_builder.generate_description(
+                title=hook_title,
+                podcast_name=podcast_name,
+                episode_title=title,
+                guest_name=highlight.guest_name,
+                topic=highlight.topic,
+                hashtags=highlight.hashtags,
+                custom_teaser=highlight.reason
             )
 
-            tags = highlight.hashtags + [podcast_name, "shorts", "podcast"]
-            if highlight.guest_name:
-                tags.append(highlight.guest_name)
-            if highlight.topic:
-                tags.append(highlight.topic)
+            tags = metadata_builder.generate_tags(
+                podcast_name=podcast_name,
+                guest_name=highlight.guest_name,
+                topic=highlight.topic,
+                hashtags=highlight.hashtags
+            )
 
             upload_url = youtube_service.upload_video(
                 final_video_path,
-                highlight.title + " #shorts",
+                hook_title,
                 description,
                 tags,
                 thumbnail_path,
+                category_id=category_id,
             )
 
             if upload_url:
