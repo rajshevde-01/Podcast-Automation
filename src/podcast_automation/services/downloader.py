@@ -68,7 +68,7 @@ class DownloadService:
             return None
 
         logger.info(f"Discovering latest episode for {podcast.name}...")
-        videos = youtube_service.get_channel_latest_videos(podcast.channel_id, max_results=10)
+        videos = youtube_service.get_channel_latest_videos(podcast.channel_id, max_results=30)
 
         if not videos:
             logger.warning("Official API found no videos. Falling back to YouTube RSS...")
@@ -96,7 +96,7 @@ class DownloadService:
             res = requests.get(url, timeout=10)
             res.raise_for_status()
             video_ids = re.findall(r'<yt:videoId>(.*?)</yt:videoId>', res.text)
-            for vid_id in video_ids[:5]:
+            for vid_id in video_ids[:20]:
                 info = youtube_service.get_video_metadata(vid_id)
                 if info and info.get('duration', 0) > settings.MIN_EPISODE_DURATION:
                     return info
@@ -464,7 +464,7 @@ class DownloadService:
         from yt_dlp.utils import download_range_func
         opts = self.base_opts.copy()
         opts.update({
-            'format': 'bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'format': 'best[ext=mp4]/best',
             'outtmpl': output_path,
             'download_ranges': download_range_func(None, [(start_time, end_time)]),
             'force_keyframes_at_cuts': True,
