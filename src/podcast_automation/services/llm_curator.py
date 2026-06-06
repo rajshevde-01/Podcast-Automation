@@ -21,20 +21,32 @@ class CuratorService:
         return self._client
 
     def _call_llm(self, messages: List[Dict], temperature: float = 0.7) -> Optional[str]:
-        """Thin wrapper around the Groq chat API with retry."""
+        """Thin wrapper around the Groq chat API with retry and model fallback."""
+        model = settings.GROQ_MODEL or "llama-3.3-70b-versatile"
+        
         @with_retry(max_attempts=3, base_delay=2.0)
-        def _call():
+        def _call(active_model):
             completion = self.client.chat.completions.create(
                 messages=messages,
-                model=settings.GROQ_MODEL,
+                model=active_model,
                 temperature=temperature,
                 response_format={"type": "json_object"},
             )
             return completion.choices[0].message.content
+            
         try:
-            return _call()
+            return _call(model)
         except Exception as e:
-            logger.error(f"Groq API call failed: {e}")
+            err_msg = str(e).lower()
+            if "rate limit" in err_msg or "429" in err_msg:
+                fallback_model = "llama-3.1-8b-instant"
+                if model != fallback_model:
+                    logger.warning(f"⚠️ Groq rate limit hit. Falling back from '{model}' to '{fallback_model}'...")
+                    try:
+                        return _call(fallback_model)
+                    except Exception as fallback_err:
+                        logger.error(f"❌ Groq fallback model also failed: {fallback_err}")
+            logger.error(f"❌ Groq API call failed: {e}")
             return None
 
     # ------------------------------------------------------------------
