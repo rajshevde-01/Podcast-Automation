@@ -80,32 +80,41 @@ def count_queue_items() -> int:
     return sum(1 for item in QUEUE_DIR.iterdir() if item.is_dir() and (item / "metadata.json").exists())
 
 def pick_next_episode(processed_and_queued_ids: set):
-    """Pick an unprocessed and un-queued episode."""
-    for attempt in range(10):
-        podcast = downloader.get_random_podcast()
-        if not podcast:
-            logger.error("No podcasts found in list.")
-            return None
-
-        logger.info(f"🔄 Pick Episode Attempt {attempt + 1}: Checking Podcast: {podcast.name}")
-        
-        # Discover up to 10 latest videos from this channel
+    """Pick an unprocessed and un-queued episode systematically."""
+    if not os.path.exists(settings.PODCASTS_LIST_FILE):
+        logger.error(f"Podcasts list file not found: {settings.PODCASTS_LIST_FILE}")
+        return None
+    with open(settings.PODCASTS_LIST_FILE, 'r') as f:
+        data = json.load(f)
+    podcasts_data = data.get("india_top_10", []) + data.get("world_top_20", [])
+    
+    from src.podcast_automation.models import Podcast
+    podcasts = [Podcast(**choice) for choice in podcasts_data]
+    import random
+    random.shuffle(podcasts)
+    
+    logger.info(f"Checking {len(podcasts)} podcasts systematically for unprocessed episodes...")
+    for podcast in podcasts:
         if not podcast.channel_id:
             continue
             
-        videos = downloader.fetch_latest_episode(podcast) # Fetches latest valid
-        if not videos:
-            continue
+        logger.info(f"🔍 Checking Podcast: {podcast.name}")
+        try:
+            videos = downloader.fetch_latest_episode(podcast) # Fetches latest valid
+            if not videos:
+                continue
+                
+            video_id = videos["id"]
+            title = videos["title"]
             
-        video_id = videos["id"]
-        title = videos["title"]
-        
-        if video_id in processed_and_queued_ids or db_manager.is_episode_processed(video_id):
-            logger.info(f"Episode {video_id} ('{title}') is already processed or queued. Skipping.")
-            continue
+            if video_id in processed_and_queued_ids or db_manager.is_episode_processed(video_id):
+                logger.info(f"Episode {video_id} ('{title}') is already processed or queued. Skipping.")
+                continue
+                
+            return podcast, videos
+        except Exception as e:
+            logger.warning(f"Error fetching latest episode for {podcast.name}: {e}")
             
-        return podcast, videos
-        
     return None
 
 def generate_shorts(target_count: int, highlights_per_episode: int):
